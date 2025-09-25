@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaffolding - Quiz Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .results-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .title {
+            color: black;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .score {
+            color: black;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .word-list {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .word-list div {
+            color: black;
+            margin: 5px 0;
+        }
+        .correct {
+            color: #34a853; /* Green for correct */
+        }
+        .incorrect {
+            color: #ea4335; /* Red for incorrect */
+        }
+        .restart-button {
+            background-color: #d7a9e3;
+            color: #1a73e8;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #667;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <div class="title">Quiz Results</div>
+        <div class="score" id="score">Score: 0 out of 5</div>
+        <div class="word-list" id="wordList">
+            <!-- Words will be populated by JavaScript -->
+        </div>
+        <button class="restart-button" onclick="restartQuiz()">Restart Quiz</button>
+    </div>
+    <div class="footer">
+        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
+        <div>©2024 Scafwording. All Rights Reserved</div>
+    </div>
+
+    <script>
+        const words = ["cursory", "insipid", "loquacious", "flout", "serendipity"];
+        const totalWords = words.length;
+        let score = parseInt(localStorage.getItem('quizScore')) || 0;
+        let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+
+        function updateResults() {
+            // Update score
+            document.getElementById('score').textContent = `Score: ${score} out of ${totalWords}`;
+
+            // Populate word list with mastery status
+            const wordList = document.getElementById('wordList');
+            words.forEach((word, index) => {
+                const div = document.createElement('div');
+                const isCorrect = !incorrectWords.has(index) && index < score; // Correct only if not incorrect and within score
+                div.textContent = `${word}: ${isCorrect ? 'Correct' : 'Incorrect'}`;
+                div.classList.add(isCorrect ? 'correct' : 'incorrect');
+                wordList.appendChild(div);
+            });
+        }
+
+        function restartQuiz() {
+            localStorage.setItem('quizScore', 0);
+            localStorage.setItem('incorrectWords', JSON.stringify([]));
+            window.location.href = 'learn-quiz.html?index=0';
+        }
+
+        // Initial load
+        updateResults();
+    </script>
+</body>
+</html>

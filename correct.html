@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaffolding - Correct Answer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .correct-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .word {
+            color: black;
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+        .definition {
+            color: black;
+            margin-bottom: 20px;
+        }
+        .next-button {
+            background-color: #d7a9e3;
+            color: #1a73e8;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="correct-container">
+        <div class="word">flout</div>
+        <div class="definition">To openly disregard a rule or law.</div>
+        <a href="quiz.html?index=0" class="next-button" id="nextBtn">Next Word</a>
+    </div>
+
+    <script>
+        let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
+        document.getElementById('nextBtn').href = `quiz.html?index=${currentIndex + 1}`;
+    </script>
+</body>
+</html>

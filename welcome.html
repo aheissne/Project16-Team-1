@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaffwording - Welcome Ethan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            margin-top: 20px;
+        }
+        .welcome {
+            margin-top: 40px;
+        }
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            background: conic-gradient(#34a853 14%, #e0e0e0 0deg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .progress-circle::before {
+            content: '14 out of 1000 Words Learned';
+            color: white;
+            font-size: 0.8em;
+        }
+        .progress-circle:nth-child(2) {
+            background: conic-gradient(#fbbc04 100%, #e0e0e0 0deg);
+        }
+        .progress-circle:nth-child(2)::before {
+            content: '100% Retention Score';
+            color: white;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+        }
+        .feedback {
+            margin: 40px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html">Scafwording</a>
+        <a href="index.html" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
+    </div>
+    <div class="welcome">
+        <h2>Welcome Ethan,</h2>
+        <p>You have learned for 1 consecutive day!</p>
+        <div class="progress">
+            <div class="progress-circle"></div>
+            <div class="progress-circle"></div>
+        </div>
+        <div class="buttons">
+            <a href="learn.html"><button>Learn more words</button></a>
+            <a href="quiz.html"><button>Start a Daily Quiz</button></a>
+        </div>
+    </div>
+    <div class="feedback">
+        <p>Rate Your Learning Journey</p>
+        <button>Share Feedback</button>
+    </div>
+    <div class="footer">
+        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
+        <div>©2024 Scafwording. All Rights Reserved</div>
+    </div>
+</body>
+</html>

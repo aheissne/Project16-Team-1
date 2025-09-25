@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaffolding - Learn Meaning</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .learn-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 400px;
+        }
+        .dialogue {
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .option-btn {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            transition: background-color 0.3s;
+        }
+        .option-btn.correct {
+            background-color: #34a853;
+            color: white;
+        }
+        .option-btn.incorrect {
+            background-color: #ea4335;
+            color: white;
+        }
+        .option-btn:hover {
+            background-color: #f0f0f0;
+        }
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="learn-container">
+        <div class="dialogue" id="dialogue"></div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options">
+            <!-- Options will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
+            let currentWord = decodeURIComponent(new URLSearchParams(window.location.search).get('word')) || 'loquacious';
+
+            // Load or initialize the set of incorrect word indices
+            let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+
+            // Define word-specific dialogues and options
+            const wordData = {
+                'cursory': {
+                    dialogue: 'Mia: He just glanced at the report and moved on. Alex: Yeah, his review was pretty <span id="dynamicWord"></span>!',
+                    question: '<span id="dynamicWordQuestion"></span> means?',
+                    options: [
+                        { text: 'a) Thorough', correct: false },
+                        { text: 'b) Hasty', correct: true },
+                        { text: 'c) Detailed', correct: false },
+                        { text: 'd) Careful', correct: false }
+                    ]
+                },
+                'insipid': {
+                    dialogue: 'Mia: This soup tastes so bland. Alex: I agree, it’s completely <span id="dynamicWord"></span>!',
+                    question: '<span id="dynamicWordQuestion"></span> means?',
+                    options: [
+                        { text: 'a) Flavorful', correct: false },
+                        { text: 'b) Dull', correct: true },
+                        { text: 'c) Spicy', correct: false },
+                        { text: 'd) Rich', correct: false }
+                    ]
+                },
+                'loquacious': {
+                    dialogue: 'Mia: She hasn’t stopped talking since we arrived! Alex: Yes, she’s incredibly <span id="dynamicWord"></span> today.',
+                    question: '<span id="dynamicWordQuestion"></span> means?',
+                    options: [
+                        { text: 'a) Silent', correct: false },
+                        { text: 'b) Reserved', correct: false },
+                        { text: 'c) Shy', correct: false },
+                        { text: 'd) Talkative', correct: true }
+                    ]
+                },
+                'flout': {
+                    dialogue: 'Mia: He ignored the rules again. Alex: Yeah, he loves to <span id="dynamicWord"></span> authority!',
+                    question: '<span id="dynamicWordQuestion"></span> means?',
+                    options: [
+                        { text: 'a) Obey', correct: false },
+                        { text: 'b) Respect', correct: false },
+                        { text: 'c) Disregard', correct: true },
+                        { text: 'd) Follow', correct: false }
+                    ]
+                },
+                'serendipity': {
+                    dialogue: 'Mia: I found this book by chance and loved it! Alex: That’s such a moment of <span id="dynamicWord"></span>!',
+                    question: '<span id="dynamicWordQuestion"></span> means?',
+                    options: [
+                        { text: 'a) Planning', correct: false },
+                        { text: 'b) Luck', correct: true },
+                        { text: 'c) Effort', correct: false },
+                        { text: 'd) Struggle', correct: false }
+                    ]
+                }
+            };
+
+            // Set dynamic content
+            const data = wordData[currentWord] || wordData['loquacious']; // Default to loquacious if word not found
+            document.getElementById('dialogue').innerHTML = data.dialogue.replace('<span id="dynamicWord"></span>', `<span id="dynamicWord">${currentWord}</span>`);
+            document.getElementById('question').innerHTML = data.question.replace('<span id="dynamicWordQuestion"></span>', `<span id="dynamicWordQuestion">${currentWord}</span>`);
+
+            // Populate options dynamically
+            const optionsContainer = document.getElementById('options');
+            data.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option.text;
+                button.onclick = () => checkAnswer(button, option.text.charAt(0));
+                optionsContainer.appendChild(button);
+            });
+
+            function checkAnswer(button, selected) {
+                const options = document.querySelectorAll('.option-btn');
+                const correctOption = data.options.find(opt => opt.correct).text.charAt(0);
+
+                options.forEach(btn => {
+                    btn.classList.remove('correct', 'incorrect', 'disabled');
+                });
+
+                if (selected === correctOption) {
+                    button.classList.add('correct');
+                    button.classList.add('disabled');
+                    if (!incorrectWords.has(currentIndex)) {
+                        let score = parseInt(localStorage.getItem('quizScore')) || 0;
+                        score++;
+                        localStorage.setItem('quizScore', score);
+                    }
+                    setTimeout(() => {
+                        window.location.href = `correct.html?index=${currentIndex}`;
+                    }, 500);
+                } else {
+                    button.classList.add('incorrect');
+                    button.classList.add('disabled');
+                    if (!incorrectWords.has(currentIndex)) {
+                        incorrectWords.add(currentIndex);
+                        localStorage.setItem('incorrectWords', JSON.stringify([...incorrectWords]));
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

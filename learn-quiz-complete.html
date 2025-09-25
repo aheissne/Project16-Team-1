@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaffolding - Quiz Complete</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .complete-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+        .message {
+            color: #1a73e8;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .score {
+            color: #1a73e8;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .restart {
+            background-color: #34a853;
+        }
+        .view-results {
+            background-color: #4285f4;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #667;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="complete-container">
+        <div class="message">Congratulations! You've completed the quiz!</div>
+        <div class="score" id="score">Score: 0 out of 5</div>
+        <div class="buttons">
+            <button class="restart" onclick="restartQuiz()">Restart Quiz</button>
+            <button class="view-results" onclick="window.location.href='learn-results.html'">View Results</button>
+        </div>
+    </div>
+    <div class="footer">
+        <div>Contact Support: <a href="mailto:support@scaffording.app">support@scaffording.app</a></div>
+        <div>©2024 Scaffording. All Rights Reserved</div>
+    </div>
+
+    <script>
+        function updateScore() {
+            const totalWords = 5;
+            let score = parseInt(localStorage.getItem('quizScore')) || 0;
+            document.getElementById('score').textContent = `Score: ${score} out of ${totalWords}`;
+        }
+
+        function restartQuiz() {
+            localStorage.setItem('quizScore', 0);
+            localStorage.setItem('incorrectWords', JSON.stringify([]));
+            window.location.href = 'learn-quiz.html?index=0';
+        }
+
+        // Initial load
+        updateScore();
+    </script>
+</body>
+</html>
