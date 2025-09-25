@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scaffolding - Correct Answer</title>
+    <title>Scafwording - Correct</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,44 +15,89 @@
             align-items: center;
             height: 100vh;
         }
-        .correct-container {
+        .container {
             background-color: white;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             width: 300px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
         .word {
-            color: black;
-            font-size: 2.5em;
-            margin: 10px 0;
+            color: #1a73e8;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        .definition {
+        .meaning {
             color: black;
+            font-size: 1.2em;
             margin-bottom: 20px;
         }
         .next-button {
-            background-color: #d7a9e3;
-            color: #1a73e8;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
             cursor: pointer;
-            width: 100%;
+            font-size: 1em;
+        }
+        .next-button:hover {
+            background-color: #1557a0;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.8em;
         }
     </style>
 </head>
 <body>
-    <div class="correct-container">
-        <div class="word">flout</div>
-        <div class="definition">To openly disregard a rule or law.</div>
-        <a href="quiz.html?index=0" class="next-button" id="nextBtn">Next Word</a>
+    <div class="container">
+        <div class="word" id="word"></div>
+        <div class="meaning" id="meaning"></div>
+        <button class="next-button" onclick="nextWord()">Next Word</button>
+    </div>
+    <div class="footer">
+        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
+        <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
 
     <script>
-        let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
-        document.getElementById('nextBtn').href = `quiz.html?index=${currentIndex + 1}`;
+        // Move nextWord function to global scope
+        function nextWord() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentIndex = parseInt(urlParams.get('index')) || 0;
+            const maxQuestions = parseInt(urlParams.get('max')) || 5;
+
+            currentIndex++;
+            if (currentIndex >= maxQuestions) {
+                window.location.href = `learn-quiz-complete.html?max=${maxQuestions}`;
+            } else {
+                window.location.href = `learn-quiz.html?index=${currentIndex}&max=${maxQuestions}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get current index and max from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentIndex = parseInt(urlParams.get('index')) || 0;
+            const maxQuestions = parseInt(urlParams.get('max')) || 5;
+
+            // Define word data (simplified for this example, expand as needed)
+            const words = {
+                0: { word: "cursory", meaning: "Hasty and superficial." },
+                1: { word: "insipid", meaning: "Lacking flavor or interest." },
+                2: { word: "loquacious", meaning: "Talkative." },
+                3: { word: "flout", meaning: "To openly disregard a rule or law." },
+                4: { word: "serendipity", meaning: "The occurrence of finding something valuable when least expected." }
+            };
+
+            // Display the current word and meaning
+            const currentWord = words[currentIndex];
+            document.getElementById('word').textContent = currentWord.word;
+            document.getElementById('meaning').textContent = currentWord.meaning;
+        });
     </script>
 </body>
 </html>
