@@ -47,7 +47,7 @@
         .incorrect {
             color: #ea4335; /* Red for incorrect */
         }
-        .restart-button {
+        .buttons {
             background-color: #d7a9e3;
             color: #1a73e8;
             padding: 10px 20px;
@@ -70,7 +70,10 @@
         <div class="word-list" id="wordList">
             <!-- Words will be populated by JavaScript -->
         </div>
-        <button class="restart-button" onclick="restartQuiz()">Restart Quiz</button>
+        <div>
+            <button class="buttons" onclick="restartQuiz()">Restart Quiz</button>
+            <button class="buttons" onclick="goBack()">Back to Dashboard</button>
+        </div>
     </div>
     <div class="footer">
         <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
@@ -98,10 +101,27 @@
             });
         }
 
+        const learnedWords = JSON.parse(localStorage.getItem('learnedWords')) || [];
+        const wordList = document.getElementById('wordList');
+        if (learnedWords.length === 0) {
+            wordList.innerHTML = '<div class="word-item">No words learned yet.</div>';
+        } else {
+            learnedWords.forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'word-item';
+                div.textContent = word;
+                wordList.appendChild(div);
+            });
+        }
+
         function restartQuiz() {
             localStorage.setItem('quizScore', 0);
             localStorage.setItem('incorrectWords', JSON.stringify([]));
             window.location.href = 'learn-quiz.html?index=0';
+        }
+
+        function goBack() {
+            window.location.href = 'welcome.html?index=0';
         }
 
         // Initial load
