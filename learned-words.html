@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scafwording - Learned Words</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+        .title {
+            color: #1a73e8;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        .word-list {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .word-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #34a853; /* Green for learned words */
+        }
+        .clear-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .clear-button:hover {
+            background-color: #1557a0;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Learned Words</div>
+        <div class="word-list" id="wordList">
+            <!-- Words will be populated by JavaScript -->
+        </div>
+        <button class="clear-button" onclick="clearLearnedWords()">Clear Learned Words</button>
+        <button onclick="goBack()">Back to Dashboard</button>
+    </div>
+    <div class="footer">
+        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
+        <div>©2024 Scafwording. All Rights Reserved</div>
+    </div>
+
+    <script>
+        let wordList;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load learned words from localStorage
+            let learnedWords = JSON.parse(localStorage.getItem('learnedWords')) || [];
+
+            // Populate the word list
+            const wordList = document.getElementById('wordList');
+            if (learnedWords.length === 0) {
+                wordList.innerHTML = '<div class="word-item">No words learned yet.</div>';
+            } else {
+                learnedWords.forEach(word => {
+                    const div = document.createElement('div');
+                    div.className = 'word-item';
+                    div.textContent = word;
+                    wordList.appendChild(div);
+                });
+            }
+        });
+        
+        function clearLearnedWords() {
+                localStorage.setItem('learnedWords', JSON.stringify([]));
+                wordList.innerHTML = '<div class="word-item">No words learned yet.</div>';
+            }
+
+        function goBack() {
+            window.location.href = 'welcome.html?index=0';
+        }
+    </script>
+</body>
+</html>
