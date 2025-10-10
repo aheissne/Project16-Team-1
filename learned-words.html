@@ -58,46 +58,65 @@
 <body>
     <div class="container">
         <div class="title">Learned Words</div>
-        <div class="word-list" id="wordList">
-            <!-- Words will be populated by JavaScript -->
+
+        <!-- word list + optional message placeholders -->
+        <div class="word-list" id="wordList"></div>
+        <div id="emptyMsg" style="display:none; color:#666; font-size:0.9em; margin-bottom:10px;">
+            No words yet — take a quiz to add some!
         </div>
-        <button class="clear-button" onclick="clearLearnedWords()">Clear Learned Words</button>
+
+        <button id="clearBtn" class="clear-button" onclick="clearLearnedWords()" style="display:none;">
+            Clear Learned Words
+        </button>
         <button onclick="goBack()">Back to Dashboard</button>
     </div>
+
     <div class="footer">
         <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
         <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
 
+    <!-- ✅ NEW SCRIPT BLOCK -->
     <script>
-        let wordList;
+      function renderLearned() {
+        const listEl   = document.getElementById('wordList');
+        const clearBtn = document.getElementById('clearBtn');
+        const emptyMsg = document.getElementById('emptyMsg');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load learned words from localStorage
-            let learnedWords = JSON.parse(localStorage.getItem('learnedWords')) || [];
+        const learned = JSON.parse(localStorage.getItem('learnedWords') || 'null');
 
-            // Populate the word list
-            const wordList = document.getElementById('wordList');
-            if (learnedWords.length === 0) {
-                wordList.innerHTML = '<div class="word-item">No words learned yet.</div>';
-            } else {
-                learnedWords.forEach(word => {
-                    const div = document.createElement('div');
-                    div.className = 'word-item';
-                    div.textContent = word;
-                    wordList.appendChild(div);
-                });
-            }
-        });
-        
-        function clearLearnedWords() {
-                localStorage.setItem('learnedWords', JSON.stringify([]));
-                wordList.innerHTML = '<div class="word-item">No words learned yet.</div>';
-            }
+        // Reset UI
+        listEl.innerHTML = '';
+        listEl.style.display = 'none';
+        clearBtn.style.display = 'none';
+        emptyMsg.style.display = 'none';
 
-        function goBack() {
-            window.location.href = 'welcome.html?index=0';
+        if (Array.isArray(learned) && learned.length > 0) {
+          // Show list + clear button
+          learned.forEach(w => {
+            const div = document.createElement('div');
+            div.className = 'word-item';
+            div.textContent = w;
+            listEl.appendChild(div);
+          });
+          listEl.style.display = 'block';
+          clearBtn.style.display = 'inline-block';
+        } else {
+          // Optional message when no words exist
+          emptyMsg.style.display = 'block';
         }
+      }
+
+      document.addEventListener('DOMContentLoaded', renderLearned);
+
+      function clearLearnedWords() {
+        localStorage.removeItem('learnedWords');
+        renderLearned();
+      }
+
+      function goBack() {
+        window.location.href = 'welcome.html?index=0';
+      }
     </script>
 </body>
 </html>
