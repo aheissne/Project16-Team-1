@@ -33,45 +33,46 @@
   </div>
 
   <!-- ONE script block only -->
-  <script>
-    const words = ["cursory","insipid","loquacious","flout","serendipity"];
-    const totalWords = words.length;
-    const score = parseInt(localStorage.getItem('quizScore')) || 0;
-    const incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+<script>
+  const words = ["cursory","insipid","loquacious","flout","serendipity"];
+  const totalWords = words.length;
+  const score = parseInt(localStorage.getItem('quizScore')) || 0;
+  const incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
 
-    function saveLearned(word){
-      const arr = JSON.parse(localStorage.getItem('learnedWords')) || [];
-      if(!arr.includes(word)){
-        arr.push(word);
-        localStorage.setItem('learnedWords', JSON.stringify(arr));
-      }
-    }
+// ✅ Update learnedWords list to only include correct words
+const learned = [];
+words.forEach((word, i) => {
+  const isCorrect = !incorrectWords.has(i);
+  if (isCorrect) learned.push(word);
+});
+localStorage.setItem('learnedWords', JSON.stringify(learned));
 
-    function updateResults(){
-      document.getElementById('score').textContent = `Score: ${score} out of ${totalWords}`;
-      const list = document.getElementById('wordList');
-      list.innerHTML = '';
-      words.forEach((word, i) => {
-        const isCorrect = !incorrectWords.has(i) && i < score;
-        const div = document.createElement('div');
-        div.textContent = `${word}: ${isCorrect ? 'Correct' : 'Incorrect'}`;
-        div.classList.add(isCorrect ? 'correct' : 'incorrect');
-        list.appendChild(div);
-        if (isCorrect) saveLearned(word);
-      });
-    }
 
-    function restartQuiz(){
-      localStorage.setItem('quizScore', 0);
-      localStorage.setItem('incorrectWords', JSON.stringify([]));
-      window.location.href = 'learn-quiz.html?index=0';
-    }
+  function updateResults(){
+    document.getElementById('score').textContent = `Score: ${score} out of ${totalWords}`;
+    const list = document.getElementById('wordList');
+    list.innerHTML = '';
+    words.forEach((word, i) => {
+      const isCorrect = !incorrectWords.has(i);   // <-- use i, not index; no saving here
+      const div = document.createElement('div');
+      div.textContent = `${word}: ${isCorrect ? 'Correct' : 'Incorrect'}`;
+      div.classList.add(isCorrect ? 'correct' : 'incorrect');
+      list.appendChild(div);
+    });
+  }
 
-    function goBack(){
-      window.location.href = 'welcome.html?index=0';
-    }
+  function restartQuiz(){
+    localStorage.setItem('quizScore', 0);
+    localStorage.setItem('incorrectWords', JSON.stringify([]));
+    window.location.href = 'learn-quiz.html?index=0';
+  }
 
-    document.addEventListener('DOMContentLoaded', updateResults);
-  </script>
+  function goBack(){
+    window.location.href = 'welcome.html?index=0';
+  }
+
+  document.addEventListener('DOMContentLoaded', updateResults);
+</script>
+
 </body>
 </html>
