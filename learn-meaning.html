@@ -24,8 +24,6 @@
     }
     .dialogue { color: #1a73e8; margin-bottom: 20px; }
     .question { font-weight: bold; margin-bottom: 12px; }
-
-    /* GIF hint block */
     #gifHint { margin: 8px 0 18px; }
     #gifHint img {
       max-width: 260px;
@@ -46,15 +44,14 @@
       background: #fff;
       cursor: pointer;
     }
-.hint-toggle {
-  margin: 6px 0 12px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-
+    .hint-toggle {
+      margin: 6px 0 12px;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+    }
     .options {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -74,8 +71,27 @@
     .option-btn.incorrect { background-color: #ea4335; color: white; }
     .option-btn:hover { background-color: #f0f0f0; }
     .option-btn.disabled { cursor: not-allowed; opacity: 0.6; }
-
-    /* Respect reduced motion: hide animated GIF and show still */
+    .speak-btn {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .speak-btn:hover {
+      background-color: #1557b0;
+    }
+    .speak-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .speak-btn.speaking {
+      background-color: #34a853;
+    }
     @media (prefers-reduced-motion: reduce) {
       #gifHint img[data-kind="gif"] { display: none; }
       #gifHint img[data-kind="still"] { display: block; }
@@ -85,24 +101,15 @@
 <body>
   <div class="learn-container">
     <div class="dialogue" id="dialogue"></div>
+    <button class="speak-btn" id="speakBtn">🔊 Listen to Dialogue</button>
     <div class="question" id="question"></div>
-	<button id="toggleHint" class="hint-btn hint-toggle" aria-expanded="false">Show Gif Hint</button>
-	<div id="gifHint" aria-live="polite" hidden></div>
-
-
- 
-
-    <div class="options" id="options"><!-- Options populated by JS --></div>
+    <button id="toggleHint" class="hint-btn hint-toggle" aria-expanded="false">Show Gif Hint</button>
+    <div id="gifHint" aria-live="polite" hidden></div>
+    <div class="options" id="options"></div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
-      let currentWord = decodeURIComponent(new URLSearchParams(window.location.search).get('word')) || 'loquacious';
-
-      // Track incorrect words
-      let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
-
       // Word data (dialogue + MC options)
       const wordData = {
         'cursory': {
@@ -157,40 +164,31 @@
         }
       };
 
-      // Simple map of word -> GIF & still image (place files in assets/gifs/)
+      // Simple map of word -> GIF
       const gifMap = {
-        'cursory':     { gif: 'assets/gifs/cursory.gif'},
-        'insipid':     { gif: 'assets/gifs/insipid.gif'},
-        'loquacious':  { gif: 'assets/gifs/loquacious.gif'},
-        'flout':       { gif: 'assets/gifs/flout.gif',},
-        'serendipity': { gif: 'assets/gifs/serendipity.gif'}
+        'cursory': { gif: 'assets/gifs/cursory.gif' },
+        'insipid': { gif: 'assets/gifs/insipid.gif' },
+        'loquacious': { gif: 'assets/gifs/loquacious.gif' },
+        'flout': { gif: 'assets/gifs/flout.gif' },
+        'serendipity': { gif: 'assets/gifs/serendipity.gif' }
       };
 
+      let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
+      let currentWord = decodeURIComponent(new URLSearchParams(window.location.search).get('word') || 'loquacious');
+      let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+
+      // Ensure currentWord is valid
+      if (!wordData[currentWord]) {
+        console.warn(`Invalid word: ${currentWord}, defaulting to 'loquacious'`);
+        currentWord = 'loquacious';
+      }
+
       // Render dialogue + question
-      const data = wordData[currentWord] || wordData['loquacious'];
+      const data = wordData[currentWord];
       document.getElementById('dialogue').innerHTML =
         data.dialogue.replace('<span id="dynamicWord"></span>', `<span id="dynamicWord">${currentWord}</span>`);
       document.getElementById('question').innerHTML =
         data.question.replace('<span id="dynamicWordQuestion"></span>', `<span id="dynamicWordQuestion">${currentWord}</span>`);
-
-// Toggle-to-show behavior (paste here)
-const toggleBtn = document.getElementById('toggleHint');
-const gifContainer = document.getElementById('gifHint');
-let hintBuilt = false;
-
-toggleBtn.addEventListener('click', () => {
-  const isHidden = gifContainer.hasAttribute('hidden');
-  if (isHidden) {
-    if (!hintBuilt) { buildGifHint(currentWord); hintBuilt = true; }
-    gifContainer.removeAttribute('hidden');
-    toggleBtn.textContent = 'Hide Hint';
-    toggleBtn.setAttribute('aria-expanded', 'true');
-  } else {
-    gifContainer.setAttribute('hidden', '');
-    toggleBtn.textContent = 'Show Gif Hint';
-    toggleBtn.setAttribute('aria-expanded', 'false');
-  }
-});
 
       // Render options
       const optionsContainer = document.getElementById('options');
@@ -202,7 +200,138 @@ toggleBtn.addEventListener('click', () => {
         optionsContainer.appendChild(button);
       });
 
+      // Text-to-speech function
+      const speakBtn = document.getElementById('speakBtn');
+      function speak(text) {
+        const cleanText = text.replace(/<span id="dynamicWord"><\/span>/, currentWord).replace(/<[^>]+>/g, '');
+        window.speechSynthesis.cancel(); // Cancel any ongoing speech
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.2; // Slightly faster, similar to pyttsx3 rate of 160
+        speakBtn.textContent = '🔊 Speaking...';
+        speakBtn.classList.add('speaking');
+        speakBtn.disabled = true;
+        utterance.onend = () => {
+          speakBtn.textContent = '🔊 Listen Again';
+          speakBtn.classList.remove('speaking');
+          speakBtn.disabled = false;
+        };
+        utterance.onerror = () => {
+          speakBtn.textContent = '🔊 Listen to Dialogue';
+          speakBtn.classList.remove('speaking');
+          speakBtn.disabled = false;
+        };
+        window.speechSynthesis.speak(utterance);
+      }
+
+      speakBtn.addEventListener('click', () => {
+        speak(data.dialogue); // Use data.dialogue, now accessible
+      });
+
+      // GIF hint toggle
+      const toggleBtn = document.getElementById('toggleHint');
+      const gifContainer = document.getElementById('gifHint');
+      let hintBuilt = false;
+
+      toggleBtn.addEventListener('click', () => {
+        window.speechSynthesis.cancel(); // Stop speech when toggling hint
+        speakBtn.textContent = '🔊 Listen to Dialogue';
+        speakBtn.classList.remove('speaking');
+        speakBtn.disabled = false;
+
+        const isHidden = gifContainer.hasAttribute('hidden');
+        if (isHidden) {
+          if (!hintBuilt) {
+            buildGifHint(currentWord);
+            hintBuilt = true;
+          }
+          gifContainer.removeAttribute('hidden');
+          toggleBtn.textContent = 'Hide Hint';
+          toggleBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          gifContainer.setAttribute('hidden', '');
+          toggleBtn.textContent = 'Show Gif Hint';
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      function buildGifHint(word) {
+        if (!word || !gifMap[word]) {
+          console.error(`Invalid or missing word for GIF: ${word}, defaulting to 'loquacious'`);
+          word = 'loquacious';
+        }
+        const cfg = gifMap[word];
+        const container = document.getElementById('gifHint');
+        container.innerHTML = '';
+
+        if (!cfg) {
+          container.textContent = 'No hint available.';
+          console.warn(`No GIF configuration found for word: ${word}`);
+          return;
+        }
+
+        function preload(src) {
+          return new Promise((resolve, reject) => {
+            if (!src) return reject('no-src');
+            const img = new Image();
+            img.onload = () => resolve(src);
+            img.onerror = () => {
+              console.error(`Failed to load image: ${src}`);
+              reject(src);
+            };
+            img.src = src;
+          });
+        }
+
+        preload(cfg.gif)
+          .then((gifSrc) => {
+            const gif = document.createElement('img');
+            gif.src = gifSrc;
+            gif.alt = `${word} visual hint (animated)`;
+            gif.setAttribute('data-kind', 'gif');
+            styleHintImage(gif);
+            container.appendChild(gif);
+
+            const controls = document.createElement('div');
+            controls.className = 'hint-controls';
+
+            const btn = document.createElement('button');
+            btn.className = 'hint-btn';
+            btn.textContent = 'Pause';
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const paused = gif.style.visibility === 'hidden';
+              if (paused) {
+                gif.style.visibility = 'visible';
+                btn.textContent = 'Pause';
+              } else {
+                gif.style.visibility = 'hidden';
+                btn.textContent = 'Play';
+              }
+            };
+
+            controls.appendChild(btn);
+            container.appendChild(controls);
+          })
+          .catch((err) => {
+            container.innerHTML =
+              `<div style="color:#666;font-size:.9em">Couldn’t load hint. Check file: <code>${cfg.gif}</code></div>`;
+            console.error(`GIF load error for ${word}: ${err}`);
+          });
+
+        function styleHintImage(img) {
+          img.style.maxWidth = '260px';
+          img.style.borderRadius = '10px';
+          img.style.display = 'block';
+          img.style.margin = '10px auto 0';
+        }
+      }
+
       function checkAnswer(button, selected) {
+        window.speechSynthesis.cancel(); // Stop speech when answering
+        speakBtn.textContent = '🔊 Listen to Dialogue';
+        speakBtn.classList.remove('speaking');
+        speakBtn.disabled = false;
+
         const options = document.querySelectorAll('.option-btn');
         const correctOption = data.options.find(opt => opt.correct).text.charAt(0);
 
@@ -224,73 +353,9 @@ toggleBtn.addEventListener('click', () => {
             incorrectWords.add(currentIndex);
             localStorage.setItem('incorrectWords', JSON.stringify([...incorrectWords]));
           }
+          speakBtn.disabled = false; // Re-enable after incorrect answer
         }
       }
-
-function buildGifHint(word) {
-  const cfg = gifMap[word];
-  const container = document.getElementById('gifHint');
-  container.innerHTML = '';
-
-  if (!cfg) {
-    container.textContent = 'No hint available.';
-    return;
-  }
-
-  // Preload so we only insert if it actually loads
-  function preload(src) {
-    return new Promise((resolve, reject) => {
-      if (!src) return reject('no-src');
-      const img = new Image();
-      img.onload = () => resolve(src);
-      img.onerror = () => reject(src);
-      img.src = src;
-    });
-  }
-
-  preload(cfg.gif)
-    .then((gifSrc) => {
-      const gif = document.createElement('img');
-      gif.src = gifSrc;
-      gif.alt = `${word} visual hint (animated)`;
-      gif.setAttribute('data-kind', 'gif');
-      styleHintImage(gif);
-      container.appendChild(gif);
-
-      // Simple Pause/Play (hide/show the same GIF)
-      const controls = document.createElement('div');
-      controls.className = 'hint-controls';
-
-      const btn = document.createElement('button');
-      btn.className = 'hint-btn';
-      btn.textContent = 'Pause';
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const paused = gif.style.visibility === 'hidden';
-        if (paused) {
-          gif.style.visibility = 'visible';
-          btn.textContent = 'Pause';
-        } else {
-          gif.style.visibility = 'hidden';
-          btn.textContent = 'Play';
-        }
-      };
-
-      controls.appendChild(btn);
-      container.appendChild(controls);
-    })
-    .catch(() => {
-      container.innerHTML =
-        `<div style="color:#666;font-size:.9em">Couldn’t load hint. Check file: <code>${cfg.gif}</code></div>`;
-    });
-
-  function styleHintImage(img) {
-    img.style.maxWidth = '260px';
-    img.style.borderRadius = '10px';
-    img.style.display = 'block';
-    img.style.margin = '10px auto 0';
-  }
-}
     });
   </script>
 </body>
