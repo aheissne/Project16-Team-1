@@ -76,47 +76,42 @@
         <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
 
-    <!-- ✅ NEW SCRIPT BLOCK -->
-    <script>
-      function renderLearned() {
-        const listEl   = document.getElementById('wordList');
-        const clearBtn = document.getElementById('clearBtn');
-        const emptyMsg = document.getElementById('emptyMsg');
+      <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const words = JSON.parse(localStorage.getItem('learnedWords')) || [];
+  const listEl = document.getElementById('wordList');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const clearBtn = document.getElementById('clearBtn');
 
-        const learned = JSON.parse(localStorage.getItem('learnedWords') || 'null');
+  if (words.length === 0) {
+    emptyMsg.style.display = 'block';
+    clearBtn.style.display = 'none';
+    return;
+  }
 
-        // Reset UI
-        listEl.innerHTML = '';
-        listEl.style.display = 'none';
-        clearBtn.style.display = 'none';
-        emptyMsg.style.display = 'none';
+  words.forEach(w => {
+    const item = document.createElement('div');
+    item.className = 'word-item';
+    item.textContent = w;
+    listEl.appendChild(item);
+  });
 
-        if (Array.isArray(learned) && learned.length > 0) {
-          // Show list + clear button
-          learned.forEach(w => {
-            const div = document.createElement('div');
-            div.className = 'word-item';
-            div.textContent = w;
-            listEl.appendChild(div);
-          });
-          listEl.style.display = 'block';
-          clearBtn.style.display = 'inline-block';
-        } else {
-          // Optional message when no words exist
-          emptyMsg.style.display = 'block';
-        }
-      }
+  clearBtn.style.display = 'inline-block';
+});
 
-      document.addEventListener('DOMContentLoaded', renderLearned);
+function clearLearnedWords() {
+  localStorage.removeItem('learnedWords');
+  document.getElementById('wordList').innerHTML = '';
+  document.getElementById('emptyMsg').style.display = 'block';
+  document.getElementById('clearBtn').style.display = 'none';
+}
 
-      function clearLearnedWords() {
-        localStorage.removeItem('learnedWords');
-        renderLearned();
-      }
+function goBack() {
+  // ⬇️ set this to your real dashboard/welcome page
+  window.location.href = 'welcome.html';
+}
+</script>
 
-      function goBack() {
-        window.location.href = 'welcome.html?index=0';
-      }
-    </script>
+
 </body>
 </html>
