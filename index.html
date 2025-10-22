@@ -77,6 +77,37 @@
         .review {
             margin: 10px 0;
         }
+	.review-table {
+   	    width: 90%;
+            max-width: 800px;
+   	    margin: 20px auto;
+       	    border-collapse: collapse;
+    	    text-align: left;
+	}
+
+	.review-table th, .review-table td {
+	    border: 1px solid #ccc;
+	    padding: 10px;
+	    vertical-align: top;
+	}
+
+	.review-table th {
+	    background-color: #f2f2f2;
+	    color: #333;
+	}
+
+	.name-cell {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	}
+
+	.star-rating {
+	    margin-left: 10px;
+	    color: #ffa500; /* optional: color stars gold */
+	    font-size: 0.9em;
+}
+
     </style>
 </head>
 <body>
@@ -101,6 +132,7 @@
     <div class="reviews">
         <div>Total Reviews: 55</div>
         <div class="rating">
+	
             <div>Average Rating</div>
             <div>4.8 ★★★★★</div>
             <div class="rating-bar">
@@ -109,11 +141,44 @@
             <div>Ratings</div>
         </div>
         <div class="user-reviews">
-            <div class="review">Abdul Ahad <span>4/25/25</span><br>The word which is done, need a feature to review them again. Here once the word is on quiz</div>
-            <div class="review">Craig <span>4/17/25</span></div>
-            <div class="review">Harshith <span>4/13/25</span> ★★★★☆</div>
-        </div>
+  <table class="review-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Review</th>
+      </tr>
+    </thead>
+    <tbody>
+  <tr>
+    <td>Abdul Ahad</td>
+    <td>4/25/25</td>
+    <td>The word which is done, need a feature to review them again. Here once the word is on quiz</td>
+  </tr>
+  <tr>
+    <td>Craig</td>
+    <td>4/17/25</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>
+      <div class="name-cell">
+        Harshith
+        <span class="star-rating">★★★★☆</span>
+      </div>
+    </td>
+    <td>4/13/25</td>
+    <td>Great initiative. This is really useful to learn new words in an innovative way.</td>
+  </tr>
+</tbody>
+
+  </table>
+</div>
+
+       
     </div>
 </body>
 
 </html>
+
+
