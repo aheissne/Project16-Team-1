@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scaffwording - Welcome Ethan</title>
+    <title>Scafwording - Welcome Ethan</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,13 +14,20 @@
         .header {
             margin-top: 20px;
         }
+	.logo {
+	    height: 80px; 
+	    margin-left: 110px;
+	    vertical-align: middle;
+	}
+
         .welcome {
-            margin-top: 40px;
+            margin-top: 25px;
         }
         .progress {
+	    margin-top: 45px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 150px;
         }
         .progress-circle {
             width: 100px;
@@ -38,7 +45,7 @@
             font-size: 0.8em;
         }
         .progress-circle:nth-child(2) {
-            background: conic-gradient(#fbbc04 100%, #e0e0e0 0deg);
+	        background: conic-gradient(#34a853 100%, #e0e0e0 0deg);
         }
         .progress-circle:nth-child(2)::before {
             content: '100% Retention Score';
@@ -46,6 +53,9 @@
         }
         .buttons {
             margin: 20px 0;
+	    display: flex;
+	    justify-content: center;
+	    gap: 70px;
         }
         button {
             padding: 10px 20px;
@@ -56,6 +66,15 @@
             color: white;
             cursor: pointer;
         }
+	.learned-words-btn {
+	    background-color: #fbbc04; 
+	    color: black;
+}
+
+	.feedback-button {
+	    background-color: #000080 !important;
+	    color: white;
+	}
         .feedback {
             margin: 40px 0;
             padding: 20px;
@@ -74,7 +93,9 @@
 </head>
 <body>
     <div class="header">
-        <a href="index.html">Scafwording</a>
+        <a href="index.html">
+	    <img src="scafwording.jpg" alt="Scafwording Logo" class="logo">
+	</a>
         <a href="index.html" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
     </div>
     <div class="welcome">
@@ -88,11 +109,11 @@
             <a href="learn.html"><button>Learn more words</button></a>
             <a href="quiz.html"><button>Start a Daily Quiz</button></a>
         </div>
-        <a href="learned-words.html"><button>View Learned Words</button></a>
+        <a href="learned-words.html"><button class="learned-words-btn">View Learned Words</button></a>
     </div>
     <div class="feedback">
         <p>Rate Your Learning Journey</p>
-        <button>Share Feedback</button>
+        <button class="feedback-button">Share Feedback</button>
     </div>
     <div class="footer">
         <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
