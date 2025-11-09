@@ -1,0 +1,122 @@
+{
+  "1": {
+    "word": "cursory",
+    "definition": "Hasty and superficial; done quickly with little attention to detail.",
+    "hints": {
+      "dialogue": "Mia: He just glanced at the report and moved on. Alex: Yeah, his review was pretty cursory!",
+      "context": "The inspector gave the building a cursory look before approving it.",
+      "story": "Rushing to finish, the student gave his essay only a cursory review, missing several obvious typos.",
+      "gif": "assets/gifs/cursory.gif"
+    },
+    "choices": ["thorough", "hasty", "detailed", "careful"],
+    "correct_index": 1
+  },
+  "2": {
+    "word": "insipid",
+    "definition": "Lacking flavor, zest, or interest; dull or boring.",
+    "hints": {
+      "dialogue": "Mia: This soup tastes so bland. Alex: I agree, it’s completely insipid!",
+      "context": "The lecture was so insipid that half the class fell asleep.",
+      "story": "Despite its colorful cover, the novel was insipid and failed to hold anyone’s attention.",
+      "gif": "assets/gifs/insipid.gif"
+    },
+    "choices": ["flavorful", "dull", "spicy", "rich"],
+    "correct_index": 1
+  },
+  "3": {
+    "word": "loquacious",
+    "definition": "Very talkative; tending to talk a great deal.",
+    "hints": {
+      "dialogue": "Mia: She hasn’t stopped talking since we arrived! Alex: Yes, she’s incredibly loquacious today.",
+      "context": "The loquacious tour guide kept us entertained with endless stories.",
+      "story": "During the family reunion, Uncle Tom’s loquacious nature made sure no one else could get a word in.",
+      "gif": "assets/gifs/loquacious.gif"
+    },
+    "choices": ["silent", "reserved", "shy", "talkative"],
+    "correct_index": 3
+  },
+  "4": {
+    "word": "flout",
+    "definition": "To openly disregard or mock rules, laws, or conventions.",
+    "hints": {
+      "dialogue": "Mia: He ignored the rules again. Alex: Yeah, he loves to flout authority!",
+      "context": "She decided to flout the dress code and wear bright sneakers to the formal meeting.",
+      "story": "The rebellious teen openly flouted curfew, strolling in hours late without apology.",
+      "gif": "assets/gifs/flout.gif"
+    },
+    "choices": ["obey", "respect", "disregard", "follow"],
+    "correct_index": 2
+  },
+  "5": {
+    "word": "serendipity",
+    "definition": "The occurrence of fortunate discoveries by chance or accident.",
+    "hints": {
+      "dialogue": "Mia: I found this book by chance and loved it! Alex: That’s such a moment of serendipity!",
+      "context": "Finding my lost keys at the coffee shop I rarely visit felt like pure serendipity.",
+      "story": "Through serendipity, the scientist stumbled upon a new formula while testing something else entirely.",
+      "gif": "assets/gifs/serendipity.gif"
+    },
+    "choices": ["planning", "luck", "effort", "struggle"],
+    "correct_index": 1
+  },
+  "6": {
+    "word": "abate",
+    "definition": "To lessen in intensity, degree, or amount; to diminish.",
+    "hints": {
+      "dialogue": "Mia: The storm finally seems to be calming down. Alex: Yeah, it’s starting to abate.",
+      "context": "The city waited for the heavy rain to abate before reopening the roads.",
+      "story": "After hours of argument, the tension in the room began to abate and everyone started to relax.",
+      "gif": "assets/gifs/abate.gif"
+    },
+    "choices": ["reduce", "increase", "delay", "argue"],
+    "correct_index": 0
+  },
+  "7": {
+    "word": "benevolent",
+    "definition": "Kind and generous; showing goodwill and desire to help others.",
+    "hints": {
+      "dialogue": "Mia: That teacher always helps her students after class. Alex: She’s such a benevolent person.",
+      "context": "The benevolent organization provided food and shelter to those in need.",
+      "story": "Known for his benevolent nature, the businessman donated half of his fortune to charity.",
+      "gif": "assets/gifs/benevolent.gif"
+    },
+    "choices": ["kind", "cruel", "greedy", "rude"],
+    "correct_index": 0
+  },
+  "8": {
+    "word": "cacophony",
+    "definition": "A harsh, jarring mixture of sounds.",
+    "hints": {
+      "dialogue": "Mia: The kids are all playing instruments at once! Alex: What a cacophony!",
+      "context": "The cacophony of honking cars filled the city streets.",
+      "story": "As the parade began, drums, whistles, and cheering created a joyful cacophony that echoed down the avenue.",
+      "gif": "assets/gifs/cacophony.gif"
+    },
+    "choices": ["harmony", "noise", "melody", "peace"],
+    "correct_index": 1
+  },
+  "9": {
+    "word": "diligent",
+    "definition": "Hard-working and careful in doing tasks; showing steady effort.",
+    "hints": {
+      "dialogue": "Mia: You’ve been studying every night this week! Alex: I’m just trying to stay diligent.",
+      "context": "Her diligent work on the project earned her a promotion.",
+      "story": "Even after the others gave up, Sam remained diligent, double-checking every detail of his research.",
+      "gif": "assets/gifs/diligent.gif"
+    },
+    "choices": ["lazy", "careless", "hard-working", "slow"],
+    "correct_index": 2
+  },
+  "10": {
+    "word": "erudite",
+    "definition": "Having or showing great knowledge; scholarly and learned.",
+    "hints": {
+      "dialogue": "Mia: Did you hear his lecture? Alex: Yes, it was incredibly erudite and insightful.",
+      "context": "The professor’s erudite remarks impressed everyone in the audience.",
+      "story": "As an erudite scholar, she could discuss philosophy, art, and science with equal ease.",
+      "gif": "assets/gifs/erudite.gif"
+    },
+    "choices": ["ignorant", "educated", "shy", "silly"],
+    "correct_index": 1
+  }
+}

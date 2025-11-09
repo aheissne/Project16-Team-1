@@ -1,0 +1,10 @@
+{
+  "q_table_file": "q_table.pkl",
+  "words_file": "words.json",
+  "hint_types": ["dialogue", "story", "gif"],
+  "alpha": 0.05,
+  "gamma": 0.8,
+  "exploration_rate": 0.2,
+  "initial_q_value": 0.1,
+  "rewards": { "correct": 1.0, "incorrect": -0.5 }
+}
