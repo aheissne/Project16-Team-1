@@ -64,40 +64,35 @@
     </div>
 
     <script>
-        // Move nextWord function to global scope
-        function nextWord() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let currentIndex = parseInt(urlParams.get('index')) || 0;
-            const maxQuestions = parseInt(urlParams.get('max')) || 5;
+(async () => {
+  const SELECTED = JSON.parse(localStorage.getItem('selectedWordIds') || '[]');
+  const MAX = Number(localStorage.getItem('maxQuestions')) || SELECTED.length || 5;
 
-            currentIndex++;
-            if (currentIndex >= maxQuestions) {
-                window.location.href = `learn-quiz-complete.html?max=${maxQuestions}`;
-            } else {
-                window.location.href = `learn-quiz.html?index=${currentIndex}&max=${maxQuestions}`;
-            }
-        }
+  const params = new URLSearchParams(location.search);
+  let currentIndex = parseInt(params.get('index')) || 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get current index and max from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            let currentIndex = parseInt(urlParams.get('index')) || 0;
-            const maxQuestions = parseInt(urlParams.get('max')) || 5;
+  // Load words.json and current word
+  const WORDS = await fetch('words.json').then(r => r.json());
+  const wordId = Number(SELECTED[currentIndex]);
+  const entry = WORDS[String(wordId)];
 
-            // Define word data (simplified for this example, expand as needed)
-            const words = {
-                0: { word: "cursory", meaning: "Hasty and superficial." },
-                1: { word: "insipid", meaning: "Lacking flavor or interest." },
-                2: { word: "loquacious", meaning: "Talkative." },
-                3: { word: "flout", meaning: "To openly disregard a rule or law." },
-                4: { word: "serendipity", meaning: "The occurrence of finding something valuable when least expected." }
-            };
+  // Show word + meaning
+  document.getElementById('word').textContent = entry?.word || `Word ${wordId}`;
+  const correctLetter = ['a','b','c','d'][entry.correct_index];
+  document.getElementById('meaning').textContent =
+    `${correctLetter}) ${entry.choices[entry.correct_index]}`;
 
-            // Display the current word and meaning
-            const currentWord = words[currentIndex];
-            document.getElementById('word').textContent = currentWord.word;
-            document.getElementById('meaning').textContent = currentWord.meaning;
-        });
-    </script>
+  // Next navigation using dynamic MAX
+  window.nextWord = function () {
+    currentIndex++;
+    if (currentIndex >= Math.min(MAX, SELECTED.length)) {
+      window.location.href = 'learn-quiz-complete.html';
+    } else {
+      window.location.href = `learn-quiz.html?index=${currentIndex}`;
+    }
+  };
+})();
+</script>
+
 </body>
 </html>
