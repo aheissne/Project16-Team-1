@@ -94,7 +94,7 @@
 <body>
     <div class="header">
         <a href="index.html">
-	    <img src="scafwording.jpg" alt="Scafwording Logo" class="logo">
+	    <img src="assets/gifs/scafwording.jpg" alt="Scafwording Logo" class="logo">
 	</a>
         <a href="index.html" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
     </div>
@@ -119,6 +119,85 @@
         <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
         <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
+
+<script>
+(async () => {
+  // 1) Load dictionary size for totals
+  const WORDS = await fetch('words.json').then(r => r.json()).catch(()=> ({}));
+  const TOTAL_DICT = Object.keys(WORDS).length || 10; // fallback
+
+  // 2) Username + greeting
+  const name = localStorage.getItem('username') || 'there';
+  document.title = 'Scaffwording - Welcome ' + name; // fix spelling in title
+  const h2 = document.querySelector('.welcome h2');
+  if (h2) h2.textContent = `Welcome ${name},`;
+
+  // 3) Learned words progress
+  const learned = JSON.parse(localStorage.getItem('learnedWords') || '[]');
+  const learnedCount = learned.length;
+  const learnedPct = Math.max(0, Math.min(100, (learnedCount / TOTAL_DICT) * 100));
+
+  // 4) Retention = last quiz score / maxQuestions
+  const score = Number(localStorage.getItem('quizScore') || '0');
+  const selected = JSON.parse(localStorage.getItem('selectedWordIds') || '[]');
+  const maxQ = Number(localStorage.getItem('maxQuestions')) || (selected.length || 5);
+  const retentionPct = maxQ ? Math.max(0, Math.min(100, (score / maxQ) * 100)) : 0;
+
+  // 5) Paint the two progress rings and labels
+  const rings = document.querySelectorAll('.progress-circle');
+  if (rings[0]) {
+    rings[0].style.background = `conic-gradient(#34a853 ${learnedPct * 3.6}deg, #e0e0e0 0deg)`;
+    rings[0].setAttribute('aria-label', `${learnedCount} of ${TOTAL_DICT} words learned`);
+    rings[0].style.position = 'relative';
+    rings[0].innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:.76em;padding:8px;text-align:center;">
+      ${learnedCount} of ${TOTAL_DICT} Words Learned
+    </div>`;
+  }
+  if (rings[1]) {
+    rings[1].style.background = `conic-gradient(#34a853 ${retentionPct * 3.6}deg, #e0e0e0 0deg)`;
+    rings[1].setAttribute('aria-label', `${retentionPct.toFixed(0)}% retention`);
+    rings[1].style.position = 'relative';
+    rings[1].innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:.9em;padding:8px;text-align:center;">
+      ${retentionPct.toFixed(0)}% Retention
+    </div>`;
+  }
+
+  // 6) Make the two CTA buttons set up a 10-word session by default
+  function setSelection(n = 10) {
+    // If you later add a picker, write those IDs here instead of 1..n
+    const ids = Array.from({length: Math.min(n, TOTAL_DICT)}, (_, i) => i + 1);
+    localStorage.setItem('selectedWordIds', JSON.stringify(ids));
+    localStorage.setItem('maxQuestions', String(ids.length));
+  }
+
+  // Replace anchor+button nesting with click handlers on anchors
+  const learnLink = document.querySelector('a[href="learn.html"]');
+  const quizLink  = document.querySelector('a[href="quiz.html"]');
+
+  if (learnLink) {
+    learnLink.addEventListener('click', (e) => {
+      setSelection(10);             // default to 10
+      // optionally start at first learn card
+      // window.location.href = 'learn-quiz.html?index=0'; return e.preventDefault();
+    });
+  }
+  if (quizLink) {
+    quizLink.addEventListener('click', (e) => {
+      setSelection(10);             // default to 10
+      // quiz.html will read maxQuestions/selectedWordIds and route to quiz-questions
+    });
+  }
+
+  // 7) (Nice-to-have) Streak text
+  const p = document.querySelector('.welcome p');
+  if (p) {
+    const days = Number(localStorage.getItem('streakDays') || '1');
+    p.textContent = `You have learned for ${days} consecutive ${days === 1 ? 'day' : 'days'}!`;
+  }
+})();
+</script>
+
+
 </body>
 </html>
 

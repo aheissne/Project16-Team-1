@@ -1,74 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scaffording - Learn Words</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .header {
-            margin-top: 20px;
-        }
-        .content {
-            margin-top: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        select {
-            padding: 10px;
-            font-size: 1em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 20px;
-            width: 200px;
-        }
-        button {
-            padding: 10px 20px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #1a73e8;
-            color: white;
-            cursor: pointer;
-            width: 200px;
-        }
-        .back-link {
-            margin-top: 20px;
-            color: #1a73e8;
-            text-decoration: none;
-        }
-        .footer {
-            margin-top: 40px;
-            color: #667;
-            font-size: 0.8em;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scaffwording - Learn Words</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; }
+    .header { margin-top: 20px; padding: 0 16px; display:flex; justify-content:space-between; align-items:center; }
+    .header a { color:#1a73e8; text-decoration:none; }
+    .logout { padding: 5px 10px; background:#1a73e8; color:#fff; border-radius:5px; }
+    .content { margin-top: 100px; display:flex; flex-direction:column; align-items:center; }
+    select { padding:10px; font-size:1em; border-radius:5px; border:1px solid #ccc; margin-top:20px; width:200px; }
+    button.primary { padding:10px 20px; margin-top:20px; border:none; border-radius:5px; background:#1a73e8; color:#fff; cursor:pointer; width:200px; }
+    .back-link { margin-top:20px; color:#1a73e8; text-decoration:none; }
+    .footer { margin-top:40px; color:#667; font-size:0.8em; }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <a href="welcome.html">Scafwording</a>
-        <a href="#" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
-    </div>
-    <div class="content">
-        <h2>How many words to study?</h2>
-        <select>
-            <option value="5">5 Words</option>
-            <option value="10">10 Words</option>
-            <option value="15">15 Words</option>
-            <option value="20">20 Words</option>
-        </select>
-        <a href="learn-quiz.html"><button>Start Learning</button></a>
-        <a href="welcome.html" class="back-link">Back to Dashboard</a>
-    </div>
-    <div class="footer">
-        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
-        <div>©2024 Scafwording. All Rights Reserved</div>
-    </div>
+  <div class="header">
+    <a href="welcome.html">Scaffwording</a>
+    <a href="#" class="logout">Log out</a>
+  </div>
+
+  <div class="content">
+    <h2>How many words to study?</h2>
+    <select id="countSelect">
+      <option value="5">5 Words</option>
+      <option value="10">10 Words</option>
+      <option value="15">15 Words</option>
+      <option value="20">20 Words</option>
+    </select>
+    <button class="primary" id="startBtn">Start Learning</button>
+    <a href="welcome.html" class="back-link">Back to Dashboard</a>
+  </div>
+
+  <div class="footer">
+    <div>Contact Support: <a href="mailto:support@scaffwording.app">support@scaffwording.app</a></div>
+    <div>©2024 Scaffwording. All Rights Reserved</div>
+  </div>
+
+<script>
+  async function loadWords() {
+    try {
+      const r = await fetch('words.json');
+      return await r.json();
+    } catch {
+      return {};
+    }
+  }
+
+  document.getElementById('startBtn').addEventListener('click', async () => {
+    const WORDS = await loadWords();
+    const allIds = Object.keys(WORDS).map(Number).filter(Number.isInteger).sort((a,b)=>a-b);
+
+    const requested = Number(document.getElementById('countSelect').value) || 5;
+    const available = allIds.length;
+    const clamped = available ? Math.min(requested, available) : requested;
+
+    // ✅ Clear any old stored selections before saving new ones
+    localStorage.removeItem('selectedWordIds');
+    localStorage.removeItem('maxQuestions');
+    localStorage.removeItem('quizScore');
+    localStorage.removeItem('incorrectWords')
+    localStorage.removeItem('attemptsMap');  
+
+    // ✅ If words.json failed or is empty, synthesize 1..N so we don't save [].
+    const selected = available
+      ? allIds.slice(0, clamped)
+      : Array.from({ length: clamped }, (_, i) => i + 1);
+
+    // ✅ Save the new session
+    localStorage.setItem('selectedWordIds', JSON.stringify(selected));
+    localStorage.setItem('maxQuestions', String(clamped));
+    localStorage.setItem('quizScore', '0');
+    localStorage.setItem('incorrectWords', JSON.stringify([]));
+
+    // Go to the quiz
+    // 🕒 Small delay to ensure Safari saves localStorage before navigating
+setTimeout(() => {
+  window.location.href = 'learn-quiz.html?index=0';
+}, 150);
+
+  });
+</script>
 </body>
 </html>

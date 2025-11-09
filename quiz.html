@@ -68,5 +68,22 @@
         <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
         <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
+<!-- add before </body> -->
+<script>
+  const selectEl = document.querySelector('select');
+  const startBtn = document.querySelector('a[href="quiz-questions.html"]');
+
+  startBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const n = Number(selectEl.value) || 5;
+    // default to 1..n; (later you can customize which IDs)
+    const ids = Array.from({length: n}, (_,i) => i+1);
+    localStorage.setItem('selectedWordIds', JSON.stringify(ids));
+    localStorage.setItem('maxQuestions', String(n));
+    window.location.href = 'quiz-questions.html?index=0';
+  });
+</script>
+
+
 </body>
 </html>

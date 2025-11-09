@@ -1,202 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scafwording - Quiz Questions</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4a4a4a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .quiz-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 400px;
-        }
-        .dialogue {
-            color: #1a73e8;
-            font-size: 2em;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .question {
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-            padding: 0 20px;
-        }
-        .option-btn {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: white;
-            transition: background-color 0.3s;
-        }
-        .option-btn.correct {
-            background-color: #34a853;
-            color: white;
-        }
-        .option-btn.incorrect {
-            background-color: #ea4335;
-            color: white;
-        }
-        .option-btn:hover {
-            background-color: #f0f0f0;
-        }
-        .option-btn.disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scaffwording - Quiz Questions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #4a4a4a;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh;
+    }
+    .quiz-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 400px;
+    }
+    .dialogue {
+      color: #1a73e8;
+      font-size: 2em;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .option-btn {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: white;
+      transition: background-color 0.3s;
+    }
+    .option-btn.correct { background-color: #34a853; color: white; }
+    .option-btn.incorrect { background-color: #ea4335; color: white; }
+    .option-btn:hover { background-color: #f0f0f0; }
+    .option-btn.disabled { cursor: not-allowed; opacity: 0.6; }
+  </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <div class="dialogue" id="dialogue"></div>
-        <div class="question" id="question"></div>
-        <div class="options" id="options">
-            <!-- Options will be populated by JavaScript -->
-        </div>
-    </div>
+  <div class="quiz-container">
+    <div class="dialogue" id="dialogue"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
-            const maxQuestions = parseInt(new URLSearchParams(window.location.search).get('max')) || 5;
-            const words = ["cursory", "insipid", "loquacious", "flout", "serendipity"];
-            let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+  <script>
+    // Load words.json once
+    let WORDS_CACHE = null;
+    async function loadWordsOnce() {
+      if (WORDS_CACHE) return WORDS_CACHE;
+      const r = await fetch('words.json');
+      WORDS_CACHE = await r.json(); // keys "1","2",...
+      return WORDS_CACHE;
+    }
 
-            // Reset quizScore if starting a new quiz (index = 0)
-            if (currentIndex === 0) {
-                localStorage.setItem('quizScore', 0);
-            }
+    // Use selection saved by quiz.html; fallback to 1..5
+    function getSelectedIds() {
+      const saved = localStorage.getItem('selectedWordIds');
+      if (saved) {
+        try {
+          const arr = JSON.parse(saved).map(Number).filter(Number.isInteger);
+          if (arr.length) return arr;
+        } catch {}
+      }
+      // default to 1..(maxQuestions or 5)
+      const n = Number(localStorage.getItem('maxQuestions')) || 5;
+      return Array.from({length: n}, (_,i)=> i+1);
+    }
 
-            // Define word-specific dialogues and options
-            const wordData = {
-                'cursory': {
-                    dialogue: 'cursory',
-                    question: 'means?',
-                    options: [
-                        { text: 'a) Thorough', correct: false },
-                        { text: 'b) Hasty', correct: true },
-                        { text: 'c) Detailed', correct: false },
-                        { text: 'd) Careful', correct: false }
-                    ]
-                },
-                'insipid': {
-                    dialogue: 'insipid',
-                    question: 'means?',
-                    options: [
-                        { text: 'a) Flavorful', correct: false },
-                        { text: 'b) Dull', correct: true },
-                        { text: 'c) Spicy', correct: false },
-                        { text: 'd) Rich', correct: false }
-                    ]
-                },
-                'loquacious': {
-                    dialogue: 'loquacious',
-                    question: 'means?',
-                    options: [
-                        { text: 'a) Silent', correct: false },
-                        { text: 'b) Reserved', correct: false },
-                        { text: 'c) Shy', correct: false },
-                        { text: 'd) Talkative', correct: true }
-                    ]
-                },
-                'flout': {
-                    dialogue: 'flout',
-                    question: 'means?',
-                    options: [
-                        { text: 'a) Obey', correct: false },
-                        { text: 'b) Respect', correct: false },
-                        { text: 'c) Disregard', correct: true },
-                        { text: 'd) Follow', correct: false }
-                    ]
-                },
-                'serendipity': {
-                    dialogue: 'serendipity',
-                    question: 'means?',
-                    options: [
-                        { text: 'a) Planning', correct: false },
-                        { text: 'b) Luck', correct: true },
-                        { text: 'c) Effort', correct: false },
-                        { text: 'd) Struggle', correct: false }
-                    ]
-                }
-            };
+    document.addEventListener('DOMContentLoaded', async () => {
+      const WORDS = await loadWordsOnce();
+      const SELECTED = getSelectedIds();
+      const letters = ['a','b','c','d'];
 
-            function loadQuestion() {
-                if (currentIndex >= maxQuestions) {
-                    window.location.href = `quiz-results.html`; // Changed to quiz-results.html
-                    return;
-                }
+      // index within this quiz run (0-based)
+      let currentIndex = parseInt(new URLSearchParams(location.search).get('index')) || 0;
 
-                const currentWord = words[currentIndex];
-                const data = wordData[currentWord] || wordData['loquacious'];
-                document.getElementById('dialogue').textContent = data.dialogue;
-                document.getElementById('question').textContent = data.question;
+      // When starting fresh, reset score + incorrect memory
+      if (currentIndex === 0) {
+        localStorage.setItem('quizScore', '0');
+        localStorage.setItem('incorrectWords', JSON.stringify([]));
+      }
 
-                const optionsContainer = document.getElementById('options');
-                optionsContainer.innerHTML = ''; // Clear previous options
-                data.options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.className = 'option-btn';
-                    button.textContent = option.text;
-                    button.onclick = () => checkAnswer(button, option.text.charAt(0));
-                    optionsContainer.appendChild(button);
-                });
-            }
+      // total questions for this run
+      const MAX = Number(localStorage.getItem('maxQuestions')) || SELECTED.length || 5;
 
-            function checkAnswer(button, selected) {
-                const options = document.querySelectorAll('.option-btn');
-                const correctOption = wordData[words[currentIndex]].options.find(opt => opt.correct).text.charAt(0);
+      // Restore incorrect set
+      let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
 
-                options.forEach(btn => {
-                    btn.classList.remove('correct', 'incorrect', 'disabled');
-                    btn.disabled = true; // Disable all buttons after selection
-                });
+      function loadQuestion() {
+        // Finished?
+        if (currentIndex >= Math.min(MAX, SELECTED.length)) {
+          window.location.href = 'quiz-results.html';
+          return;
+        }
 
-                if (selected === correctOption) {
-                    button.classList.add('correct');
-                } else {
-                    button.classList.add('incorrect');
-                    if (!incorrectWords.has(currentIndex)) {
-                        incorrectWords.add(currentIndex);
-                        localStorage.setItem('incorrectWords', JSON.stringify([...incorrectWords]));
-                    }
-                }
+        const wordId = Number(SELECTED[currentIndex]);
+        const entry = WORDS[String(wordId)];
+        if (!entry) {
+          document.getElementById('dialogue').textContent = 'Word not found.';
+          document.getElementById('question').textContent = '';
+          document.getElementById('options').innerHTML = '';
+          return;
+        }
 
-                // Increment score only for correct answers if not previously incorrect
-                if (selected === correctOption && !incorrectWords.has(currentIndex)) {
-                    let score = parseInt(localStorage.getItem('quizScore')) || 0;
-                    score = Math.min(score + 1, maxQuestions); // Cap score at maxQuestions
-                    localStorage.setItem('quizScore', score);
-                }
+        // UI: word as title, generic “means?”
+        document.getElementById('dialogue').textContent = entry.word;
+        document.getElementById('question').textContent = 'means?';
 
-                // Automatically move to the next question after a short delay
-                setTimeout(() => {
-                    currentIndex++;
-                    loadQuestion();
-                }, 500); // 500ms delay to show feedback
-            }
-
-            // Initial load
-            loadQuestion();
+        // Render choices
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        entry.choices.forEach((choiceText, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = `${letters[idx]}) ${choiceText}`;
+          btn.onclick = () => checkAnswer(btn, letters[idx], letters[entry.correct_index]);
+          optionsEl.appendChild(btn);
         });
-    </script>
+      }
+
+      function checkAnswer(button, chosenLetter, correctLetter) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => { b.classList.remove('correct','incorrect','disabled'); b.disabled = true; });
+
+        const isCorrect = (chosenLetter === correctLetter);
+        if (isCorrect) {
+          button.classList.add('correct');
+          // Only increment if this question was never marked incorrect
+          if (!incorrectWords.has(currentIndex)) {
+            let score = Number(localStorage.getItem('quizScore') || '0');
+            score = Math.min(score + 1, Math.min(MAX, SELECTED.length));
+            localStorage.setItem('quizScore', String(score));
+          }
+        } else {
+          button.classList.add('incorrect');
+          if (!incorrectWords.has(currentIndex)) {
+            incorrectWords.add(currentIndex);
+            localStorage.setItem('incorrectWords', JSON.stringify([...incorrectWords]));
+          }
+        }
+
+        // Move to next question after brief pause
+        setTimeout(() => {
+          currentIndex++;
+          // Persist next index in URL for consistency (optional)
+          window.history.replaceState({}, '', `quiz-questions.html?index=${currentIndex}`);
+          // Re-enable and render next
+          buttons.forEach(b => b.disabled = false);
+          loadQuestion();
+        }, 500);
+      }
+
+      // Start
+      loadQuestion();
+    });
+  </script>
 </body>
 </html>

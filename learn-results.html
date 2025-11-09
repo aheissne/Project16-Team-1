@@ -3,76 +3,84 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scaffolding - Quiz Results</title>
+  <title>Scaffwording - Learn Results</title>
   <style>
-    body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#4a4a4a;display:flex;justify-content:center;align-items:center;height:100vh}
-    .results-container{background:#fff;padding:20px;border-radius:10px;text-align:center;width:300px;box-shadow:0 0 10px rgba(0,0,0,.5)}
-    .title{color:#000;font-size:1.5em;margin-bottom:20px}
+    body{font-family:Arial,sans-serif;margin:0;padding:0;background:#4a4a4a;display:flex;justify-content:center;align-items:center;height:100vh}
+    .results-container{background:#fff;padding:20px;border-radius:10px;text-align:center;width:320px;box-shadow:0 0 10px rgba(0,0,0,.4)}
+    .title{color:#1a73e8;font-size:1.5em;margin-bottom:20px}
     .score{color:#000;font-size:1.2em;margin-bottom:20px}
     .word-list{text-align:left;margin-bottom:20px}
-    .word-list div{color:#000;margin:5px 0}
-    .correct{color:#34a853}
-    .incorrect{color:#ea4335}
-    .buttons{background:#d7a9e3;color:#1a73e8;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;width:100%}
-    .footer{margin-top:40px;color:#667;font-size:.8em}
+    .word-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
+    .status.correct{color:#34a853}
+    .status.incorrect{color:#ea4335}
+    .buttons{margin-top:10px}
+    .buttons button{background:#1a73e8;color:#fff;border:none;border-radius:5px;padding:10px 18px;cursor:pointer;margin:5px}
+    .buttons button:hover{background:#1557a0}
+    .footer{margin-top:40px;color:#ccc;font-size:.8em;text-align:center}
   </style>
 </head>
 <body>
   <div class="results-container">
     <div class="title">Quiz Results</div>
-    <div class="score" id="score">Score: 0 out of 5</div>
+    <div class="score" id="score">Score: 0 out of 0</div>
     <div class="word-list" id="wordList"></div>
-    <div>
-      <button class="buttons" onclick="restartQuiz()">Restart Quiz</button>
-      <button class="buttons" onclick="goBack()">Back to Dashboard</button>
+    <div class="buttons">
+      <button onclick="restartQuiz()">Restart Quiz</button>
+      <button onclick="goBack()">Back to Dashboard</button>
     </div>
   </div>
   <div class="footer">
-    <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
-    <div>©2024 Scafwording. All Rights Reserved</div>
+    <div>Contact Support: <a href="mailto:support@scaffwording.app">support@scaffwording.app</a></div>
+    <div>©2024 Scaffwording. All Rights Reserved</div>
   </div>
 
-  <!-- ONE script block only -->
-<script>
-  const words = ["cursory","insipid","loquacious","flout","serendipity"];
-  const totalWords = words.length;
-  const score = parseInt(localStorage.getItem('quizScore')) || 0;
-  const incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const SELECTED = JSON.parse(localStorage.getItem('selectedWordIds') || '[]');
+      const maxQuestions = Number(localStorage.getItem('maxQuestions')) || SELECTED.length || 5;
+      const score = Math.min(Number(localStorage.getItem('quizScore') || '0'), maxQuestions);
+      const incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
+      const WORDS = await fetch('words.json').then(r => r.json()).catch(()=>({}));
 
-// ✅ Update learnedWords list to only include correct words
-const learned = [];
-words.forEach((word, i) => {
-  const isCorrect = !incorrectWords.has(i);
-  if (isCorrect) learned.push(word);
-});
-localStorage.setItem('learnedWords', JSON.stringify(learned));
+      // Update score
+      document.getElementById('score').textContent = `Score: ${score} out of ${maxQuestions}`;
 
+      // Populate word list
+      const list = document.getElementById('wordList');
+      list.innerHTML = '';
+      const learned = [];
+      const count = Math.min(maxQuestions, SELECTED.length);
 
-  function updateResults(){
-    document.getElementById('score').textContent = `Score: ${score} out of ${totalWords}`;
-    const list = document.getElementById('wordList');
-    list.innerHTML = '';
-    words.forEach((word, i) => {
-      const isCorrect = !incorrectWords.has(i);   // <-- use i, not index; no saving here
-      const div = document.createElement('div');
-      div.textContent = `${word}: ${isCorrect ? 'Correct' : 'Incorrect'}`;
-      div.classList.add(isCorrect ? 'correct' : 'incorrect');
-      list.appendChild(div);
+      for (let i = 0; i < count; i++) {
+        const id = Number(SELECTED[i]);
+        const entry = WORDS[String(id)] || {};
+        const word = entry.word || `Word ${id}`;
+        const isCorrect = !incorrectWords.has(i);
+        if (isCorrect) learned.push(word);
+
+        const div = document.createElement('div');
+        div.className = 'word-item';
+        div.innerHTML = `
+          <span>${word}</span>
+          <span class="status ${isCorrect ? 'correct' : 'incorrect'}">
+            ${isCorrect ? 'Correct' : 'Incorrect'}
+          </span>`;
+        list.appendChild(div);
+      }
+
+      // Save learned words
+
     });
-  }
 
-  function restartQuiz(){
-    localStorage.setItem('quizScore', 0);
-    localStorage.setItem('incorrectWords', JSON.stringify([]));
-    window.location.href = 'learn-quiz.html?index=0';
-  }
+    function restartQuiz() {
+      localStorage.setItem('quizScore', '0');
+      localStorage.setItem('incorrectWords', JSON.stringify([]));
+      window.location.href = 'learn-quiz.html?index=0';
+    }
 
-  function goBack(){
-    window.location.href = 'welcome.html?index=0';
-  }
-
-  document.addEventListener('DOMContentLoaded', updateResults);
-</script>
-
+    function goBack() {
+      window.location.href = 'welcome.html';
+    }
+  </script>
 </body>
 </html>

@@ -3,359 +3,379 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scaffolding - Learn Meaning</title>
+  <title>Scaffwording - Learn Meaning</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #4a4a4a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      margin: 0; padding: 0;
+      background:#4a4a4a;
+      display:flex; justify-content:center; align-items:center;
+      min-height:100vh;
     }
-    .learn-container {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      width: 400px;
+    .container {
+      background:#fff; padding:20px; border-radius:15px;
+      width:min(900px,94vw); box-shadow:0 6px 24px rgba(0,0,0,.25);
     }
-    .dialogue { color: #1a73e8; margin-bottom: 20px; }
-    .question { font-weight: bold; margin-bottom: 12px; }
-    #gifHint { margin: 8px 0 18px; }
-    #gifHint img {
-      max-width: 260px;
-      border-radius: 10px;
-      display: block;
-      margin: 0 auto;
+    .question { font-size:44px; text-align:center; margin:8px 0 10px; font-weight:700; }
+
+    /* Hint card */
+    .hint-card {
+      margin:12px auto 18px; max-width:720px;
+      padding:16px 18px 18px; border:1px solid #cfe0ff; border-radius:14px;
+      background:#f3f7ff; box-shadow:0 4px 14px rgba(26,115,232,.08);
+      position:relative; animation:hintIn .25s ease-out;
     }
-    .hint-controls {
-      margin-top: 6px;
-      display: flex;
-      justify-content: center;
-      gap: 8px;
+    @keyframes hintIn { from{transform:translateY(-6px);opacity:0} to{transform:none;opacity:1} }
+    .hint-badge {
+      position:absolute; top:-12px; left:16px; background:#1a73e8; color:#fff;
+      font-size:12px; font-weight:bold; letter-spacing:.02em; padding:4px 10px;
+      border-radius:999px; box-shadow:0 2px 8px rgba(26,115,232,.25);
     }
-    .hint-btn {
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: #fff;
-      cursor: pointer;
+    .hint-type { opacity:.9; margin-left:6px; font-weight:600; }
+    .hint-text { color:#243b66; font-size:20px; line-height:1.45; text-align:center; padding:8px 4px 4px; }
+    .hint-footer { margin-top:10px; display:flex; justify-content:center; gap:10px; }
+
+    .speak-btn, .hint-listen {
+      background:#1a73e8; color:#fff; border:none; padding:10px 16px;
+      border-radius:10px; cursor:pointer; font-size:16px; display:block; margin:8px auto; transition:.2s;
     }
-    .hint-toggle {
-      margin: 6px 0 12px;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: #fff;
-      cursor: pointer;
-    }
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      text-align: center;
-      padding: 0 20px;
-    }
+    .speak-btn:hover, .hint-listen:hover { background:#155fc7; }
+
+    #hintArea img { max-width:280px; border-radius:10px; display:block; margin:0 auto; }
+    .hint-controls { margin-top:6px; display:flex; justify-content:center; gap:8px; }
+    .hint-btn { padding:6px 10px; border:1px solid #ccc; border-radius:6px; background:#fff; cursor:pointer; }
+
+    .options { display:grid; grid-template-columns:1fr 1fr; gap:14px; text-align:center; padding:0 20px; }
     .option-btn {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: white;
-      transition: background-color 0.3s;
+      padding:16px; border:1px solid #ddd; border-radius:12px; background:#fff;
+      cursor:pointer; font-size:22px; transition:.2s;
     }
-    .option-btn.correct { background-color: #34a853; color: white; }
-    .option-btn.incorrect { background-color: #ea4335; color: white; }
-    .option-btn:hover { background-color: #f0f0f0; }
-    .option-btn.disabled { cursor: not-allowed; opacity: 0.6; }
-    .speak-btn {
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 15px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-    .speak-btn:hover {
-      background-color: #1557b0;
-    }
-    .speak-btn:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .speak-btn.speaking {
-      background-color: #34a853;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #gifHint img[data-kind="gif"] { display: none; }
-      #gifHint img[data-kind="still"] { display: block; }
-    }
+    .option-btn:hover { background:#eef3ff; border-color:#1a73e8; }
+    .option-btn.correct { background:#34a853; color:#fff; border-color:#34a853; }
+    .option-btn.incorrect { background:#ea4335; color:#fff; border-color:#ea4335; }
+    .option-btn.disabled { cursor:not-allowed; opacity:.7; }
+    .footer { text-align:center; color:#777; margin-top:12px; }
   </style>
 </head>
 <body>
-  <div class="learn-container">
-    <div class="dialogue" id="dialogue"></div>
-    <button class="speak-btn" id="speakBtn">🔊 Listen to Dialogue</button>
-    <div class="question" id="question"></div>
-    <button id="toggleHint" class="hint-btn hint-toggle" aria-expanded="false">Show Gif Hint</button>
-    <div id="gifHint" aria-live="polite" hidden></div>
-    <div class="options" id="options"></div>
+  <div class="container">
+    <div class="question"><span id="currentWord">_____</span> means?</div>
+
+    <div id="hintArea">
+      <div style="color:#5a6; background:#eef3ff; border:1px solid #dfe6ff; padding:8px 12px; display:inline-block; border-radius:10px;">
+        Fetching a helpful hint…
+      </div>
+    </div>
+    <button id="speakBtn" class="speak-btn" style="display:none;">🔊 Listen</button>
+
+    <div id="options" class="options"></div>
+    <div id="progress" class="footer"></div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Word data (dialogue + MC options)
-      const wordData = {
-        'cursory': {
-          dialogue: 'Mia: He just glanced at the report and moved on. Alex: Yeah, his review was pretty <span id="dynamicWord"></span>!',
-          question: '<span id="dynamicWordQuestion"></span> means?',
-          options: [
-            { text: 'a) Thorough', correct: false },
-            { text: 'b) Hasty', correct: true },
-            { text: 'c) Detailed', correct: false },
-            { text: 'd) Careful', correct: false }
-          ]
-        },
-        'insipid': {
-          dialogue: 'Mia: This soup tastes so bland. Alex: I agree, it’s completely <span id="dynamicWord"></span>!',
-          question: '<span id="dynamicWordQuestion"></span> means?',
-          options: [
-            { text: 'a) Flavorful', correct: false },
-            { text: 'b) Dull', correct: true },
-            { text: 'c) Spicy', correct: false },
-            { text: 'd) Rich', correct: false }
-          ]
-        },
-        'loquacious': {
-          dialogue: 'Mia: She hasn’t stopped talking since we arrived! Alex: Yes, she’s incredibly <span id="dynamicWord"></span> today.',
-          question: '<span id="dynamicWordQuestion"></span> means?',
-          options: [
-            { text: 'a) Silent', correct: false },
-            { text: 'b) Reserved', correct: false },
-            { text: 'c) Shy', correct: false },
-            { text: 'd) Talkative', correct: true }
-          ]
-        },
-        'flout': {
-          dialogue: 'Mia: He ignored the rules again. Alex: Yeah, he loves to <span id="dynamicWord"></span> authority!',
-          question: '<span id="dynamicWordQuestion"></span> means?',
-          options: [
-            { text: 'a) Obey', correct: false },
-            { text: 'b) Respect', correct: false },
-            { text: 'c) Disregard', correct: true },
-            { text: 'd) Follow', correct: false }
-          ]
-        },
-        'serendipity': {
-          dialogue: 'Mia: I found this book by chance and loved it! Alex: That’s such a moment of <span id="dynamicWord"></span>!',
-          question: '<span id="dynamicWordQuestion"></span> means?',
-          options: [
-            { text: 'a) Planning', correct: false },
-            { text: 'b) Luck', correct: true },
-            { text: 'c) Effort', correct: false },
-            { text: 'd) Struggle', correct: false }
-          ]
-        }
-      };
+    const API = "http://localhost:5001";
 
-      // Simple map of word -> GIF
-      const gifMap = {
-        'cursory': { gif: 'assets/gifs/cursory.gif' },
-        'insipid': { gif: 'assets/gifs/insipid.gif' },
-        'loquacious': { gif: 'assets/gifs/loquacious.gif' },
-        'flout': { gif: 'assets/gifs/flout.gif' },
-        'serendipity': { gif: 'assets/gifs/serendipity.gif' }
-      };
-
-      let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
-      let currentWord = decodeURIComponent(new URLSearchParams(window.location.search).get('word') || 'loquacious');
-      let incorrectWords = new Set(JSON.parse(localStorage.getItem('incorrectWords')) || []);
-
-      // Ensure currentWord is valid
-      if (!wordData[currentWord]) {
-        console.warn(`Invalid word: ${currentWord}, defaulting to 'loquacious'`);
-        currentWord = 'loquacious';
+    async function getRanked(wordId) {
+      try {
+        const r = await fetch(`${API}/get_ranked_hint_type`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word_id: Number(wordId) })
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const j = await r.json();
+        const arr = Array.isArray(j.ranked_hint_types) ? j.ranked_hint_types : [];
+        return arr.length ? arr : ["dialogue","context","story","gif"];
+      } catch (e) {
+        console.warn("[getRanked] fallback:", e);
+        return ["dialogue","context","story","gif"];
       }
+    }
 
-      // Render dialogue + question
-      const data = wordData[currentWord];
-      document.getElementById('dialogue').innerHTML =
-        data.dialogue.replace('<span id="dynamicWord"></span>', `<span id="dynamicWord">${currentWord}</span>`);
-      document.getElementById('question').innerHTML =
-        data.question.replace('<span id="dynamicWordQuestion"></span>', `<span id="dynamicWordQuestion">${currentWord}</span>`);
-
-      // Render options
-      const optionsContainer = document.getElementById('options');
-      data.options.forEach(option => {
-        const button = document.createElement('button');
-        button.className = 'option-btn';
-        button.textContent = option.text;
-        button.onclick = () => checkAnswer(button, option.text.charAt(0));
-        optionsContainer.appendChild(button);
-      });
-
-      // Text-to-speech function
-      const speakBtn = document.getElementById('speakBtn');
-      function speak(text) {
-        const cleanText = text.replace(/<span id="dynamicWord"><\/span>/, currentWord).replace(/<[^>]+>/g, '');
-        window.speechSynthesis.cancel(); // Cancel any ongoing speech
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.rate = 1.2; // Slightly faster, similar to pyttsx3 rate of 160
-        speakBtn.textContent = '🔊 Speaking...';
-        speakBtn.classList.add('speaking');
-        speakBtn.disabled = true;
-        utterance.onend = () => {
-          speakBtn.textContent = '🔊 Listen Again';
-          speakBtn.classList.remove('speaking');
-          speakBtn.disabled = false;
-        };
-        utterance.onerror = () => {
-          speakBtn.textContent = '🔊 Listen to Dialogue';
-          speakBtn.classList.remove('speaking');
-          speakBtn.disabled = false;
-        };
-        window.speechSynthesis.speak(utterance);
-      }
-
-      speakBtn.addEventListener('click', () => {
-        speak(data.dialogue); // Use data.dialogue, now accessible
-      });
-
-      // GIF hint toggle
-      const toggleBtn = document.getElementById('toggleHint');
-      const gifContainer = document.getElementById('gifHint');
-      let hintBuilt = false;
-
-      toggleBtn.addEventListener('click', () => {
-        window.speechSynthesis.cancel(); // Stop speech when toggling hint
-        speakBtn.textContent = '🔊 Listen to Dialogue';
-        speakBtn.classList.remove('speaking');
-        speakBtn.disabled = false;
-
-        const isHidden = gifContainer.hasAttribute('hidden');
-        if (isHidden) {
-          if (!hintBuilt) {
-            buildGifHint(currentWord);
-            hintBuilt = true;
-          }
-          gifContainer.removeAttribute('hidden');
-          toggleBtn.textContent = 'Hide Hint';
-          toggleBtn.setAttribute('aria-expanded', 'true');
-        } else {
-          gifContainer.setAttribute('hidden', '');
-          toggleBtn.textContent = 'Show Gif Hint';
-          toggleBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-
-      function buildGifHint(word) {
-        if (!word || !gifMap[word]) {
-          console.error(`Invalid or missing word for GIF: ${word}, defaulting to 'loquacious'`);
-          word = 'loquacious';
-        }
-        const cfg = gifMap[word];
-        const container = document.getElementById('gifHint');
-        container.innerHTML = '';
-
-        if (!cfg) {
-          container.textContent = 'No hint available.';
-          console.warn(`No GIF configuration found for word: ${word}`);
-          return;
-        }
-
-        function preload(src) {
-          return new Promise((resolve, reject) => {
-            if (!src) return reject('no-src');
-            const img = new Image();
-            img.onload = () => resolve(src);
-            img.onerror = () => {
-              console.error(`Failed to load image: ${src}`);
-              reject(src);
-            };
-            img.src = src;
-          });
-        }
-
-        preload(cfg.gif)
-          .then((gifSrc) => {
-            const gif = document.createElement('img');
-            gif.src = gifSrc;
-            gif.alt = `${word} visual hint (animated)`;
-            gif.setAttribute('data-kind', 'gif');
-            styleHintImage(gif);
-            container.appendChild(gif);
-
-            const controls = document.createElement('div');
-            controls.className = 'hint-controls';
-
-            const btn = document.createElement('button');
-            btn.className = 'hint-btn';
-            btn.textContent = 'Pause';
-            btn.onclick = (e) => {
-              e.stopPropagation();
-              const paused = gif.style.visibility === 'hidden';
-              if (paused) {
-                gif.style.visibility = 'visible';
-                btn.textContent = 'Pause';
-              } else {
-                gif.style.visibility = 'hidden';
-                btn.textContent = 'Play';
-              }
-            };
-
-            controls.appendChild(btn);
-            container.appendChild(controls);
+    async function sendOutcome(wordId, hintType, isCorrect, attempt) {
+      try {
+        await fetch(`${API}/update_model`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            word_id: Number(wordId),
+            hint_type: String(hintType),
+            reward: isCorrect ? 1 : 0,
+            attempt
           })
-          .catch((err) => {
-            container.innerHTML =
-              `<div style="color:#666;font-size:.9em">Couldn’t load hint. Check file: <code>${cfg.gif}</code></div>`;
-            console.error(`GIF load error for ${word}: ${err}`);
-          });
-
-        function styleHintImage(img) {
-          img.style.maxWidth = '260px';
-          img.style.borderRadius = '10px';
-          img.style.display = 'block';
-          img.style.margin = '10px auto 0';
-        }
+        });
+      } catch (e) {
+        console.warn("[sendOutcome] offline:", e);
       }
+    }
 
-      function checkAnswer(button, selected) {
-        window.speechSynthesis.cancel(); // Stop speech when answering
-        speakBtn.textContent = '🔊 Listen to Dialogue';
-        speakBtn.classList.remove('speaking');
-        speakBtn.disabled = false;
+    const params = new URLSearchParams(location.search);
+    let currentIndex = Number(params.get('index') || '0');
 
-        const options = document.querySelectorAll('.option-btn');
-        const correctOption = data.options.find(opt => opt.correct).text.charAt(0);
+    const $speakBtn = document.getElementById('speakBtn');
+    const $currentWord = document.getElementById('currentWord');
+    const $hintArea = document.getElementById('hintArea');
+    const $options = document.getElementById('options');
+    const $progress = document.getElementById('progress');
 
-        options.forEach(btn => btn.classList.remove('correct', 'incorrect', 'disabled'));
+    let lastHintType = null;
+    let hintQueue = [];
+    let hintIndex = -1;
 
-        if (selected === correctOption) {
-          button.classList.add('correct', 'disabled');
-          if (!incorrectWords.has(currentIndex)) {
-            let score = parseInt(localStorage.getItem('quizScore')) || 0;
-            score++;
-            localStorage.setItem('quizScore', score);
-          }
-          setTimeout(() => {
-            window.location.href = `correct.html?index=${currentIndex}`;
-          }, 500);
+    const ATTEMPTS_KEY = 'attemptsMap';
+    let attemptsMap = JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '{}');
+    function getAttempts(id){ return Number(attemptsMap[id] || 0); }
+    function setAttempts(id,n){ attemptsMap[id] = n; localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attemptsMap)); }
+    const maxAttempts = 3;
+
+    function speak(text) {
+      try {
+        window.speechSynthesis?.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 1.1;
+        $speakBtn.textContent = '🔊 Speaking…';
+        $speakBtn.disabled = true;
+        u.onend = () => { $speakBtn.textContent = '🔊 Listen Again'; $speakBtn.disabled = false; };
+        u.onerror = () => { $speakBtn.textContent = '🔊 Listen'; $speakBtn.disabled = false; };
+        speechSynthesis.speak(u);
+      } catch(e) {}
+    }
+
+    function setSpeakTarget(textOrNull) {
+      if (textOrNull && textOrNull.trim()) {
+        $speakBtn.style.display = '';
+        $speakBtn.onclick = () => speak(textOrNull);
+      } else {
+        $speakBtn.style.display = 'none';
+        $speakBtn.onclick = null;
+      }
+    }
+
+    async function loadWords() {
+      try { const r = await fetch('words.json'); return await r.json(); }
+      catch { return {}; }
+    }
+
+    // Render current hint and wire 🔊 for dialogue/story
+    async function showCurrentHint(entry, wordText) {
+      const type = hintQueue[hintIndex];
+      lastHintType = type;
+      $hintArea.innerHTML = '';
+
+      const card = document .createElement('div');
+      card.className = 'hint-card';
+
+      const badge = document.createElement('div');
+      badge.className = 'hint-badge';
+      badge.innerHTML = `Hint <span class="hint-type">• ${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
+      card.appendChild(badge);
+
+      if (type !== 'gif') {
+        const txt = entry.hints?.[type] || '(no hint text found)';
+        const body = document.createElement('div');
+        body.className = 'hint-text';
+        body.textContent = txt;
+        card.appendChild(body);
+
+        const footer = document.createElement('div');
+        footer.className = 'hint-footer';
+        card.appendChild(footer);
+
+        if (type === 'dialogue' || type === 'story') {
+          setSpeakTarget(txt);
+          $speakBtn.classList.add('hint-listen');
+          footer.appendChild($speakBtn);
+          $speakBtn.style.display = '';
         } else {
-          button.classList.add('incorrect', 'disabled');
-          if (!incorrectWords.has(currentIndex)) {
-            incorrectWords.add(currentIndex);
-            localStorage.setItem('incorrectWords', JSON.stringify([...incorrectWords]));
-          }
-          speakBtn.disabled = false; // Re-enable after incorrect answer
+          setSpeakTarget(null);
         }
+
+      } else {
+        const gifUrl = entry.hints?.gif;
+        if (!gifUrl) {
+          const body = document.createElement('div');
+          body.className = 'hint-text';
+          body.textContent = 'No GIF available.';
+          card.appendChild(body);
+        } else {
+          const img = document.createElement('img');
+          img.src = gifUrl;
+          img.alt = `${wordText} visual hint (animated)`;
+          card.appendChild(img);
+
+          const footer = document.createElement('div');
+          footer.className = 'hint-footer';
+          const btn = document.createElement('button');
+          btn.className = 'hint-btn';
+          btn.textContent = 'Pause';
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            const paused = img.style.visibility === 'hidden';
+            img.style.visibility = paused ? 'visible' : 'hidden';
+            btn.textContent = paused ? 'Pause' : 'Play';
+          };
+          footer.appendChild(btn);
+          card.appendChild(footer);
+        }
+        setSpeakTarget(null);
       }
+
+      $hintArea.appendChild(card);
+    }
+
+    async function checkAnswer(clickedBtn, chosenLetter, correctLetter, wordId, entry) {
+      window.speechSynthesis?.cancel();
+      $speakBtn.textContent = '🔊 Listen';
+      $speakBtn.disabled = false;
+
+      const optionBtns = document.querySelectorAll('.option-btn');
+      optionBtns.forEach(b => b.classList.remove('correct','incorrect','disabled'));
+
+      const isCorrect = (chosenLetter === correctLetter);
+      if (getAttempts(wordId) >= maxAttempts) return;
+
+      const attemptNum = getAttempts(wordId) + 1;
+      setAttempts(wordId, attemptNum);
+
+      if (hintIndex >= 0 && lastHintType) {
+        await sendOutcome(wordId, lastHintType, isCorrect, attemptNum);
+      }
+
+      if (isCorrect) {
+        clickedBtn.classList.add('correct','disabled');
+        const s = (Number(localStorage.getItem('quizScore')) || 0) + 1;
+        localStorage.setItem('quizScore', String(s));
+        setAttempts(wordId, 0);
+       
+        {
+  const list = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+  if (entry.word) list.add(entry.word);
+  localStorage.setItem('learnedWords', JSON.stringify([...list]));
+}
+
+        setTimeout(() => {
+          currentIndex += 1;
+          const total = Math.min(Number(localStorage.getItem('maxQuestions')) || 0,
+                                 (JSON.parse(localStorage.getItem('shuffledWordIds')) || []).length);
+          if (currentIndex >= total) window.location.href = 'learn-quiz-complete.html';
+          else window.location.href = `learn-quiz.html?index=${currentIndex}`;
+        }, 300);
+        return;
+      }
+
+      clickedBtn.classList.add('incorrect','disabled');
+      const triesLeft = Math.max(0, maxAttempts - attemptNum);
+      $progress.textContent = `Question ${currentIndex + 1} · Attempts left: ${triesLeft}`;
+
+      if (attemptNum >= maxAttempts) {
+        optionBtns.forEach(b => { b.classList.add('disabled'); b.disabled = true; });
+
+        const defText = entry.definition ??
+          (Array.isArray(entry.choices) && Number.isInteger(entry.correct_index)
+            ? entry.choices[entry.correct_index]
+            : '(definition unavailable)');
+          //  record this question as incorrect (store by question index)
+  const inc = new Set(JSON.parse(localStorage.getItem('incorrectWords') || '[]'));
+  inc.add(currentIndex);
+  localStorage.setItem('incorrectWords', JSON.stringify([...inc]));
+
+
+        const defBox = document.createElement('div');
+        defBox.style.marginTop = '15px';
+        defBox.style.padding = '10px';
+        defBox.style.border = '1px solid #ccc';
+        defBox.style.borderRadius = '8px';
+        defBox.style.background = '#f8f9ff';
+        defBox.innerHTML = `<strong>Definition:</strong> ${defText}`;
+        $hintArea.appendChild(defBox);
+
+        {
+  const list = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+  if (entry.word) list.delete(entry.word);     // ensure NOT learned if maxed out
+  localStorage.setItem('learnedWords', JSON.stringify([...list]));
+}
+
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next Word →';
+        nextBtn.style.marginTop = '12px';
+        nextBtn.style.padding = '10px 15px';
+        nextBtn.style.borderRadius = '8px';
+        nextBtn.style.background = '#1a73e8';
+        nextBtn.style.color = '#fff';
+        nextBtn.style.border = 'none';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.onclick = () => {
+          currentIndex += 1;
+          const total = Math.min(Number(localStorage.getItem('maxQuestions')) || 0,
+                                 (JSON.parse(localStorage.getItem('shuffledWordIds')) || []).length);
+          if (currentIndex >= total) window.location.href = 'learn-quiz-complete.html';
+          else window.location.href = `learn-quiz.html?index=${currentIndex}`;
+        };
+        $hintArea.appendChild(nextBtn);
+        return;
+      }
+
+      if (hintIndex < hintQueue.length - 1) hintIndex++;
+      await showCurrentHint(entry, entry.word);
+      optionBtns.forEach(b => b.classList.remove('disabled'));
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const WORDS = await loadWords();
+
+      // ---- Read the existing order; create only if missing (deep-link case) ----
+      let selectedIds = [];
+      try { selectedIds = JSON.parse(localStorage.getItem('selectedWordIds') || '[]'); } catch {}
+      if (!Array.isArray(selectedIds) || !selectedIds.length) {
+        selectedIds = Object.keys(WORDS).map(Number).filter(Number.isFinite);
+        localStorage.setItem('selectedWordIds', JSON.stringify(selectedIds));
+      }
+
+      let wordOrder = JSON.parse(localStorage.getItem('shuffledWordIds') || 'null');
+      if (!Array.isArray(wordOrder) || !wordOrder.length) {
+        // Deep-link fallback: create once, but DO NOT reset at meaning page thereafter
+        wordOrder = selectedIds.slice().sort(() => Math.random() - 0.5);
+        localStorage.setItem('shuffledWordIds', JSON.stringify(wordOrder));
+      }
+
+      const maxQ = Math.min(
+        Number(localStorage.getItem('maxQuestions')) || wordOrder.length || 5,
+        wordOrder.length
+      );
+      const wordId = wordOrder[currentIndex];
+      const entry = WORDS[String(wordId)] || {};
+      const wordText = entry.word || `Word ${wordId}`;
+
+      // Initial UI
+      $currentWord.textContent = wordText;
+      $progress.textContent = `Question ${currentIndex + 1} of ${maxQ}`;
+      $speakBtn.style.display = 'none';
+
+      // attempts per word
+      if (wordId && Number.isFinite(wordId) && !attemptsMap[wordId]) setAttempts(wordId, 0);
+
+      // Options
+      const letters = ['a','b','c','d'];
+      const allChoices = Array.isArray(entry.choices) ? entry.choices.slice(0,4) : [];
+      const correctIdx = Number.isInteger(entry.correct_index) ? entry.correct_index : 0;
+      const correctLetter = letters[correctIdx];
+
+      $options.innerHTML = '';
+      allChoices.forEach((choiceText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = `${letters[idx]}) ${choiceText}`;
+        btn.onclick = () => checkAnswer(btn, letters[idx], correctLetter, wordId, entry);
+        $options.appendChild(btn);
+      });
+
+      // Hint ranking & queue
+      const ranked = await getRanked(wordId);
+      hintQueue = ranked.filter(t => t !== 'dialogue' || !!entry.hints?.dialogue);
+      if (!hintQueue.length) hintQueue = ["story","gif"]; // last resort
+
+      hintIndex = 0;
+      await showCurrentHint(entry, wordText);
     });
   </script>
 </body>

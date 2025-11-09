@@ -1,111 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scaffolding - Word Quiz</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4a4a4a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .quiz-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-        }
-        .progress {
-            color: #1a73e8;
-            margin-bottom: 20px;
-        }
-        .word {
-            color: #1a73e8;
-            font-size: 2.5em;
-            margin: 20px 0;
-        }
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-        button, a {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 48%;
-            text-decoration: none;
-            color: white;
-        }
-        .know {
-            background-color: #34a853;
-        }
-        .dont-know {
-            background-color: #ea4335;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scaffwording - Word Quiz</title>
+  <style>
+    body { font-family: Arial, margin:0; padding:0; background:#4a4a4a;
+           display:flex; justify-content:center; align-items:center; height:100vh; }
+    .quiz-container { background:#fff; padding:20px; border-radius:16px; text-align:center;
+                      width:min(560px,92vw); box-shadow:0 6px 24px rgba(0,0,0,.25); }
+    .progress { color:#1a73e8; font-weight:600; margin-bottom:16px; font-size:20px; }
+    .word { color:#1a73e8; font-size:64px; margin:14px 0 26px; }
+    .buttons { display:flex; gap:14px; justify-content:center; }
+    button { padding:14px 18px; border-radius:12px; width:46%; border:none; color:#fff;
+             font-size:22px; cursor:pointer; transition:.2s; }
+    .know { background:#34a853; } .know:hover{ background:#2c8d46; }
+    .dont-know { background:#ea4335; } .dont-know:hover{ background:#c33428; }
+  </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <div class="progress" id="progress">Word 1 out of 5</div>
-        <div class="word" id="word">cursory</div>
-        <div class="buttons">
-            <a href="#" class="know" id="knowBtn">Know</a>
-            <a href="#" class="dont-know" id="dontKnowBtn">Don't Know</a>
-        </div>
+  <div class="quiz-container">
+    <div id="progress" class="progress">Word 1 of 5</div>
+    <div id="word" class="word">Loading…</div>
+    <div class="buttons">
+      <button id="knowBtn" class="know" type="button">Know</button>
+      <button id="dontKnowBtn" class="dont-know" type="button">Don't Know</button>
     </div>
+  </div>
 
-    <script>
-        const words = ["cursory", "insipid", "loquacious", "flout", "serendipity"];
-        let currentIndex = parseInt(new URLSearchParams(window.location.search).get('index')) || 0;
-        const totalWords = words.length;
+  <script>
+    // Hard-reload if page is restored from the back/forward cache
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) location.reload();
+    });
 
-        // Initialize or reset quizScore and incorrectWords if starting from index 0
-        if (currentIndex === 0) {
-            localStorage.setItem('quizScore', 0);
-            localStorage.setItem('incorrectWords', JSON.stringify([]));
+    // Fisher–Yates shuffle
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const WORDS = await fetch('words.json').then(r => r.json()).catch(() => ({}));
+      const allIds = Object.keys(WORDS).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
+
+      let selectedIds = JSON.parse(localStorage.getItem('selectedWordIds') || '[]');
+      const requested = Number(localStorage.getItem('maxQuestions')) ||
+                        (Array.isArray(selectedIds) ? selectedIds.length : 0) || 5;
+
+      // Normalize selection
+      if (!Array.isArray(selectedIds) || !selectedIds.length) {
+        selectedIds = allIds.slice(0, requested);
+      } else if (selectedIds.length < requested) {
+        const need = requested - selectedIds.length;
+        const extras = allIds.filter(id => !selectedIds.includes(id)).slice(0, need);
+        selectedIds = [...selectedIds, ...extras];
+      } else if (selectedIds.length > requested) {
+        selectedIds = selectedIds.slice(0, requested);
+      }
+      localStorage.setItem('selectedWordIds', JSON.stringify(selectedIds));
+
+      let currentIndex = parseInt(new URLSearchParams(location.search).get('index')) || 0;
+
+      // Fresh shuffle each new run
+     if (currentIndex === 0) {
+  localStorage.removeItem('shuffledWordIds');
+  localStorage.setItem('quizScore', '0');
+  localStorage.setItem('incorrectWords', JSON.stringify([]));
+  localStorage.setItem('learnedWords', JSON.stringify([])); // ← add this
+}
+
+
+      let wordOrder = JSON.parse(localStorage.getItem('shuffledWordIds') || 'null');
+      if (!Array.isArray(wordOrder) || wordOrder.length !== selectedIds.length) {
+        wordOrder = shuffle(selectedIds);
+        localStorage.setItem('shuffledWordIds', JSON.stringify(wordOrder));
+      }
+
+      const total = Math.min(requested, wordOrder.length);
+      if (currentIndex >= total) {
+        location.replace('learn-quiz-complete.html');
+        return;
+      }
+
+      const wordId = wordOrder[currentIndex];
+      const entry = WORDS[String(wordId)] || {};
+      const word = entry.word || `Word ${wordId}`;
+
+      document.getElementById('word').textContent = word;
+      document.getElementById('progress').textContent = `Word ${currentIndex + 1} out of ${total}`;
+
+      const nextIndex = currentIndex + 1;
+      const $know = document.getElementById('knowBtn');
+      const $dont = document.getElementById('dontKnowBtn');
+
+      // Use JS navigation (no anchor defaults) to avoid partial restores
+      $know.addEventListener('click', () => {
+        const score = parseInt(localStorage.getItem('quizScore')) || 0;
+        localStorage.setItem('quizScore', String(score + 1));
+          // ✅ add to learned words
+  const learned = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+  learned.add(word); // 'word' is defined earlier from the selected entry
+  localStorage.setItem('learnedWords', JSON.stringify([...learned]));
+
+        if (nextIndex >= total) {
+          location.replace('learn-quiz-complete.html');
+        } else {
+          location.replace(`learn-quiz.html?index=${nextIndex}`);
         }
+      });
 
-        function updateWord() {
-            if (currentIndex < totalWords) {
-                document.getElementById('word').textContent = words[currentIndex];
-                document.getElementById('progress').textContent = `Word ${currentIndex + 1} out of ${totalWords}`;
-                document.getElementById('knowBtn').href = `#`;
-                document.getElementById('dontKnowBtn').href = `learn-meaning.html?index=${currentIndex}&word=${encodeURIComponent(words[currentIndex])}`;
-            } else {
-                window.location.href = 'quiz-complete.html';
-            }
-        }
-
-        document.getElementById('knowBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (currentIndex < totalWords - 1) {
-                let score = parseInt(localStorage.getItem('quizScore')) || 0;
-                if (score < currentIndex + 1) {
-                    score++;
-                    localStorage.setItem('quizScore', score);
-                }
-                currentIndex++;
-                updateWord();
-            } else if (currentIndex === totalWords - 1) {
-                let score = parseInt(localStorage.getItem('quizScore')) || 0;
-                if (score < totalWords) {
-                    score++;
-                    localStorage.setItem('quizScore', score);
-                }
-                window.location.href = 'learn-quiz-complete.html';
-            }
-        });
-
-        // Initial load
-        updateWord();
-    </script>
+      $dont.addEventListener('click', () => {
+        // same word, switch to meaning view
+        location.replace(`learn-meaning.html?index=${currentIndex}`);
+      });
+    });
+  </script>
 </body>
 </html>
