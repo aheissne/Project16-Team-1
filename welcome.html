@@ -12,11 +12,11 @@
             padding: 0;
         }
         .header {
-            margin-top: 20px;
+            margin-top: 20px; padding: 0 16px; display:flex; justify-content:space-between; align-items:center;
         }
 	.logo {
 	    height: 80px; 
-	    margin-left: 110px;
+	    margin-left: 475px;
 	    vertical-align: middle;
 	}
 
@@ -39,18 +39,10 @@
             justify-content: center;
             position: relative;
         }
-        .progress-circle::before {
-            content: '14 out of 1000 Words Learned';
-            color: white;
-            font-size: 0.8em;
-        }
         .progress-circle:nth-child(2) {
 	        background: conic-gradient(#34a853 100%, #e0e0e0 0deg);
         }
-        .progress-circle:nth-child(2)::before {
-            content: '100% Retention Score';
-            color: white;
-        }
+
         .buttons {
             margin: 20px 0;
 	    display: flex;
@@ -99,8 +91,38 @@
         <a href="index.html" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
     </div>
     <div class="welcome">
-        <h2>Welcome Ethan,</h2>
-        <p>You have learned for 1 consecutive day!</p>
+        <h2>Welcome Ethan</h2>
+<div id="streak-container" style="margin: 30px auto; max-width: 360px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <!-- Flame + Number -->
+  <div style="position: relative; display: inline-block; margin-bottom: 8px;">
+    <svg width="120" height="140" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60 10 C30 50, 20 80, 60 130 C100 80, 90 50, 60 10" fill="#FF9C1A"/>
+      <path d="M60 20 C40 50, 35 70, 60 110 C85 70, 80 50, 60 20" fill="#FFC350"/>
+      <path d="M60 35 C48 55, 45 70, 60 100" fill="#FF9C1A"/>
+    </svg>
+    <div id="streak-number" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 58px; font-weight: 900; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+      0
+    </div>
+  </div>
+
+  <p style="color: #FF6B35; font-weight: bold; font-size: 20px; margin: 8px 0 20px;">
+    day streak!
+  </p>
+
+  <!-- 7-Day Week Bar -->
+  <div style="background: #f8f9fa; border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 10px;">
+      <span>M</span><span>Tu</span><span>W</span><span>Thu</span><span>F</span><span>Sa</span><span>Su</span>
+    </div>
+    <div id="week-circles" style="display: flex; justify-content: space-between; gap: 8px;">
+      <!-- 7 circles will be filled by JS -->
+    </div>
+
+    <p style="margin: 16px 0 0; font-size: 14px; color: #555; line-height: 1.4;">
+      A streak counts how many days<br>you've practiced in a row
+    </p>
+  </div>
+</div>
         <div class="progress">
             <div class="progress-circle"></div>
             <div class="progress-circle"></div>
@@ -130,7 +152,7 @@
   const name = localStorage.getItem('username') || 'there';
   document.title = 'Scaffwording - Welcome ' + name; // fix spelling in title
   const h2 = document.querySelector('.welcome h2');
-  if (h2) h2.textContent = `Welcome ${name},`;
+  if (h2) h2.textContent = `Welcome ${name}`;
 
   // 3) Learned words progress
   const learned = JSON.parse(localStorage.getItem('learnedWords') || '[]');
@@ -188,13 +210,82 @@
     });
   }
 
-  // 7) (Nice-to-have) Streak text
-  const p = document.querySelector('.welcome p');
-  if (p) {
-    const days = Number(localStorage.getItem('streakDays') || '1');
-    p.textContent = `You have learned for ${days} consecutive ${days === 1 ? 'day' : 'days'}!`;
-  }
 })();
+
+function updateStreakBox() {
+  let now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  let streak = parseInt(localStorage.getItem('loginStreak') || '0');
+  const lastLoginStr = localStorage.getItem('lastLoginDate');
+  const lastLogin = lastLoginStr ? new Date(lastLoginStr) : null;
+
+  // Calculate streak
+  if (!lastLogin) {
+    streak = 1;
+  } else {
+    const daysDiff = Math.floor((today - lastLogin) / (1000 * 60 * 60 * 24));
+    if (daysDiff === 0) {
+      // already logged in today
+    } else if (daysDiff === 1) {
+      streak += 1;
+    } else {
+      streak = 1; // reset
+    }
+  }
+
+  // Save login
+  localStorage.setItem('lastLoginDate', today.toISOString());
+  localStorage.setItem('loginStreak', streak);
+
+  // Update big number
+  document.getElementById('streak-number').textContent = streak;
+
+  // Render 7-day circles (Monday first → Sunday last)
+  const weekContainer = document.getElementById('week-circles');
+  weekContainer.innerHTML = '';
+
+  const dayOffset = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const offsetsFromMonday = [0, 1, 2, 3, 4, 5, 6]; // M Tu W Th F Sa Su
+
+  offsetsFromMonday.forEach((offset, index) => {
+    const checkDate = new Date(today);
+    const daysBack = (dayOffset + 6 - index) % 7; // magic: maps today correctly
+    checkDate.setDate(today.getDate() - daysBack);
+
+if (daysBack == 0){
+  streak = 1;
+}
+
+    const wasActive = streak > daysBack; // last `streak` days are active
+
+    const circle = document.createElement('div');
+    circle.style.width = '36px';
+    circle.style.height = '36px';
+    circle.style.borderRadius = '50%';
+    circle.style.background = wasActive ? '#FF9925' : '#E5E5E5';
+    circle.style.display = 'flex';
+    circle.style.alignItems = 'center';
+    circle.style.justifyContent = 'center';
+    circle.style.fontSize = '20px';
+    circle.style.color = 'white';
+    circle.style.fontWeight = 'bold';
+    circle.textContent = wasActive ? '✓' : '';
+
+    // Highlight today
+    if (daysBack === 0) {
+      circle.style.boxShadow = wasActive ? '0 0 0 4px #FFE0B2' : '0 0 0 4px #E0E0E0';
+      circle.style.transform = 'scale(1.1)';
+    }
+
+    weekContainer.appendChild(circle);
+  });
+
+
+}
+
+// Run on page load
+updateStreakBox();
 </script>
 
 
