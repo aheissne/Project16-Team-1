@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scaffwording - Word Quiz</title>
   <style>
-    body { font-family: Arial, margin:0; padding:0; background:#4a4a4a;
+    body { font-family: Arial; margin:0; padding:0; background:#4a4a4a;
            display:flex; justify-content:center; align-items:center; height:100vh; }
     .quiz-container { background:#fff; padding:20px; border-radius:16px; text-align:center;
                       width:min(560px,92vw); box-shadow:0 6px 24px rgba(0,0,0,.25); }
@@ -20,6 +20,9 @@
 </head>
 <body>
   <div class="quiz-container">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
     <div id="progress" class="progress">Word 1 of 5</div>
     <div id="word" class="word">Loading…</div>
     <div class="buttons">
@@ -103,9 +106,10 @@
         const score = parseInt(localStorage.getItem('quizScore')) || 0;
         localStorage.setItem('quizScore', String(score + 1));
           // ✅ add to learned words
-  const learned = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
-  learned.add(word); // 'word' is defined earlier from the selected entry
-  localStorage.setItem('learnedWords', JSON.stringify([...learned]));
+        const learned = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+        learned.add(word); // 'word' is defined earlier from the selected entry
+        localStorage.setItem('learnedWords', JSON.stringify([...learned]));
+        addXP(10);
 
         if (nextIndex >= total) {
           location.replace('learn-quiz-complete.html');
@@ -120,5 +124,11 @@
       });
     });
   </script>
+  <script src="xp.js"></script>
+  <script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
