@@ -52,6 +52,9 @@
 </head>
 <body>
     <div class="header">
+        <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
         <a href="welcome.html">Scafwording</a>
         <a href="index.html" style="float: right; padding: 5px 10px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px;">Log out</a>
     </div>
@@ -83,7 +86,11 @@
     window.location.href = 'quiz-questions.html?index=0';
   });
 </script>
-
-
+<script src="xp.js"></script>
+<script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
