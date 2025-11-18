@@ -14,16 +14,17 @@
         .header {
             margin-top: 20px; padding: 0 16px; display:flex; justify-content:space-between; align-items:center;
         }
-	.logo {
-	    height: 80px; 
-	    vertical-align: middle;
-	}
+	      .logo {
+	        height: 80px; 
+	        vertical-align: middle;
+          margin-right: 100px;
+	      }
 
         .welcome {
             margin-top: 25px;
         }
         .progress {
-	    margin-top: 45px;
+	          margin-top: 45px;
             display: flex;
             justify-content: center;
             gap: 150px;
@@ -43,10 +44,10 @@
         }
 
         .buttons {
-            margin: 20px 0;
-	    display: flex;
-	    justify-content: center;
-	    gap: 70px;
+          margin: 20px 0;
+	        display: flex;
+	        justify-content: center;
+	        gap: 70px;
         }
         button {
             padding: 10px 20px;
@@ -80,10 +81,27 @@
             color: #666;
             font-size: 0.8em;
         }
+
+        .xp-progress {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+.xp-fill {
+    height: 100%;
+    background: #34a853;
+    width: 0%;
+    transition: width 0.6s;
+}
     </style>
 </head>
 <body>
     <div class="header">
+      <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+      </div>
         <a href="index.html">
 	    <img src="assets/gifs/scafwording.jpg" alt="Scafwording Logo" class="logo">
 	</a>
@@ -252,10 +270,6 @@ function updateStreakBox() {
     const daysBack = (dayOffset + 6 - index) % 7; // magic: maps today correctly
     checkDate.setDate(today.getDate() - daysBack);
 
-if (daysBack == 0){
-  streak = 1;
-}
-
     const wasActive = streak > daysBack; // last `streak` days are active
 
     const circle = document.createElement('div');
@@ -286,13 +300,14 @@ if (daysBack == 0){
 // Run on page load
 updateStreakBox();
 </script>
-
-
+<script src="xp.js"></script>
+<script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
-
-
-
 
 
 
