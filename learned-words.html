@@ -57,6 +57,9 @@
 </head>
 <body>
     <div class="container">
+        <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
         <div class="title">Learned Words</div>
 
         <!-- word list + optional message placeholders -->
@@ -111,7 +114,11 @@ function goBack() {
   window.location.href = 'welcome.html';
 }
 </script>
-
-
+<script src="xp.js"></script>
+<script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
