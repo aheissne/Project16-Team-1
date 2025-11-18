@@ -52,6 +52,9 @@
 </head>
 <body>
   <div class="quiz-container">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+    </div>
     <div class="dialogue" id="dialogue"></div>
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
@@ -105,6 +108,7 @@
         // Finished?
         if (currentIndex >= Math.min(MAX, SELECTED.length)) {
           window.location.href = 'quiz-results.html';
+          addXP(50); // quiz completion bonus
           return;
         }
 
@@ -169,5 +173,12 @@
       loadQuestion();
     });
   </script>
+  <script src="xp.js"></script>
+  <script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
+
