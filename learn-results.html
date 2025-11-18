@@ -21,6 +21,9 @@
 </head>
 <body>
   <div class="results-container">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
     <div class="title">Quiz Results</div>
     <div class="score" id="score">Score: 0 out of 0</div>
     <div class="word-list" id="wordList"></div>
@@ -82,5 +85,12 @@
       window.location.href = 'welcome.html';
     }
   </script>
+  <script src="xp.js"></script>
+  <script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
+
