@@ -241,17 +241,63 @@
         await sendOutcome(wordId, lastHintType, isCorrect, attemptNum);
       }
 
-      if (isCorrect) {
+            if (isCorrect) {
+        clickedBtn.classList.add('correct', 'disabled');
+
+        // ---- NEW: show a clear "Correct!" message ----
+        const feedback = document.createElement('div');
+        feedback.textContent = '✓ Correct!';
+        feedback.style.cssText = `
+          margin: 20px auto;
+          padding: 14px 20px;
+          background: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+          border-radius: 10px;
+          font-size: 28px;
+          font-weight: bold;
+          text-align: center;
+          max-width: 400px;
+          animation: hintIn .4s ease-out;
+        `;
+        $hintArea.appendChild(feedback);
+
+        // update score and learned words exactly like before
+        const s = (Number(localStorage.getItem('quizScore')) || 0) + 1;
+        localStorage.setItem('quizScore', String(s));
+        setAttempts(wordId, 0);
+
+        {
+          const list = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+          if (entry.word) list.add(entry.word);
+          localStorage.setItem('learnedWords', JSON.stringify([...list]));
+        }
+
+        // wait 1.8 seconds so the user can see the feedback, then go to next word
+        setTimeout(() => {
+          currentIndex += 1;
+          const total = Math.min(
+            Number(localStorage.getItem('maxQuestions')) || 0,
+            (JSON.parse(localStorage.getItem('shuffledWordIds')) || []).length
+          );
+          if (currentIndex >= total) window.location.href = 'learn-quiz-complete.html';
+          else window.location.href = `learn-quiz.html?index=${currentIndex}`;
+        }, 1800);  // 1.8 seconds – feels natural
+        return;
+      
+    
+
+      /*if (isCorrect) {
         clickedBtn.classList.add('correct','disabled');
         const s = (Number(localStorage.getItem('quizScore')) || 0) + 1;
         localStorage.setItem('quizScore', String(s));
         setAttempts(wordId, 0);
        
         {
-  const list = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
-  if (entry.word) list.add(entry.word);
-  localStorage.setItem('learnedWords', JSON.stringify([...list]));
-}
+        const list = new Set(JSON.parse(localStorage.getItem('learnedWords') || '[]'));
+        if (entry.word) list.add(entry.word);
+        localStorage.setItem('learnedWords', JSON.stringify([...list]));
+      }*/
 
         setTimeout(() => {
           currentIndex += 1;
@@ -380,3 +426,4 @@
   </script>
 </body>
 </html>
+
