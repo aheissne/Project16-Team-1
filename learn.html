@@ -8,7 +8,7 @@
     body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; }
     .header { margin-top: 20px; padding: 0 16px; display:flex; justify-content:space-between; align-items:center; }
     .header a { color:#1a73e8; text-decoration:none; }
-    .logout { padding: 5px 10px; background:#1a73e8; color:#fff; border-radius:5px; }
+    .logout { padding: 5px 10px; background:#1a73e8; color:#fff; text-decoration: none; border-radius:5px; }
     .content { margin-top: 100px; display:flex; flex-direction:column; align-items:center; }
     select { padding:10px; font-size:1em; border-radius:5px; border:1px solid #ccc; margin-top:20px; width:200px; }
     button.primary { padding:10px 20px; margin-top:20px; border:none; border-radius:5px; background:#1a73e8; color:#fff; cursor:pointer; width:200px; }
@@ -18,6 +18,9 @@
 </head>
 <body>
   <div class="header">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
     <a href="welcome.html">Scaffwording</a>
     <a href="#" class="logout">Log out</a>
   </div>
@@ -82,6 +85,12 @@ setTimeout(() => {
 }, 150);
 
   });
+</script>
+<script src="xp.js"></script>
+<script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
 </script>
 </body>
 </html>
