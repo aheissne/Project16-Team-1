@@ -1,124 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scafwording - Learned Words</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #4a4a4a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-        }
-        .title {
-            color: #1a73e8;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-        .word-list {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        .word-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0;
-            color: #34a853; /* Green for learned words */
-        }
-        .clear-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #1a73e8;
-            color: white;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .clear-button:hover {
-            background-color: #1557a0;
-        }
-        .footer {
-            margin-top: 40px;
-            color: #666;
-            font-size: 0.8em;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #4a4a4a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 300px;
+      }
+      .title {
+        color: #1a73e8;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+      }
+      .word-list {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+      .word-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+        color: #34a853; /* Green for learned words */
+      }
+      .buttons {
+        margin:10px ;
+      }
+      .clear-button,
+      .back-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #1a73e8;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+        margin: 5px;
+        width: 200px;
+
+        /* ← ADD THESE TWO LINES */
+        height: 44px; /* or 48px – whatever looks good */
+        line-height: 24px; /* keeps text perfectly centered even with emojis */
+        display: inline-flex; /* best for centering text + icons */
+        align-items: center;
+        justify-content: center;
+      }
+      .clear-button:hover {
+        background-color: #1557a0;
+      }
+      .back-button:hover {
+        background-color: #1557a0;
+      }
+      .footer {
+        margin-top: 40px;
+        color: #666;
+        font-size: 0.8em;
+      }
+      /* === Beautiful XP Bar === */
+      .xp-progress {
+        height: 10px;
+        background: #e0e0e0;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-top: 2px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .xp-fill {
+        height: 100%;
+        background: linear-gradient(to right, #34a853, #5dd46c);
+        width: 0%;
+        border-radius: 6px;
+        transition: width 0.8s ease-out;
+        box-shadow: 0 2px 4px rgba(52, 168, 83, 0.3);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+      <div
+        class="xp-bar"
+        id="xpDisplay"
+        style="
+          margin: 20px 0;
+          font-weight: bold;
+          color: #1a73e8;
+          display: inline-block;
+        "
+      >
         Loading XP...
-        </div>
-        <div class="title">Learned Words</div>
+      </div>
+      <div class="title">Learned Words</div>
 
-        <!-- word list + optional message placeholders -->
-        <div class="word-list" id="wordList"></div>
-        <div id="emptyMsg" style="display:none; color:#666; font-size:0.9em; margin-bottom:10px;">
-            No words yet — take a quiz to add some!
-        </div>
-
-        <button id="clearBtn" class="clear-button" onclick="clearLearnedWords()" style="display:none;">
-            Clear Learned Words
-        </button>
-        <button onclick="goBack()">Back to Dashboard</button>
+      <!-- word list + optional message placeholders -->
+      <div class="word-list" id="wordList"></div>
+      <div
+        id="emptyMsg"
+        style="
+          display: none;
+          color: #666;
+          font-size: 0.9em;
+          margin-bottom: 10px;
+        "
+      >
+        No words yet — take a quiz to add some!
+      </div>
+      <div class="buttons">
+      <button
+        id="clearBtn"
+        class="clear-button"
+        onclick="clearLearnedWords()"
+        style="display: none">
+        Clear Learned Words
+      </button>
+      <button onclick="goBack()" class="back-button">Back to Dashboard</button>
     </div>
 
     <div class="footer">
-        <div>Contact Support: <a href="mailto:support@scafwording.app">support@scafwording.app</a></div>
-        <div>©2024 Scafwording. All Rights Reserved</div>
+      <div>
+        Contact Support:
+        <a href="mailto:support@scafwording.app">support@scafwording.app</a>
+      </div>
+      <div>©2024 Scafwording. All Rights Reserved</div>
     </div>
 
-      <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const words = JSON.parse(localStorage.getItem('learnedWords')) || [];
-  const listEl = document.getElementById('wordList');
-  const emptyMsg = document.getElementById('emptyMsg');
-  const clearBtn = document.getElementById('clearBtn');
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const words = JSON.parse(localStorage.getItem("learnedWords")) || [];
+        const listEl = document.getElementById("wordList");
+        const emptyMsg = document.getElementById("emptyMsg");
+        const clearBtn = document.getElementById("clearBtn");
 
-  if (words.length === 0) {
-    emptyMsg.style.display = 'block';
-    clearBtn.style.display = 'none';
-    return;
-  }
+        if (words.length === 0) {
+          emptyMsg.style.display = "block";
+          clearBtn.style.display = "none";
+          return;
+        }
 
-  words.forEach(w => {
-    const item = document.createElement('div');
-    item.className = 'word-item';
-    item.textContent = w;
-    listEl.appendChild(item);
-  });
+        words.forEach((w) => {
+          const item = document.createElement("div");
+          item.className = "word-item";
+          item.textContent = w;
+          listEl.appendChild(item);
+        });
 
-  clearBtn.style.display = 'inline-block';
-});
+        clearBtn.style.display = "inline-block";
+      });
 
-function clearLearnedWords() {
-  localStorage.removeItem('learnedWords');
-  document.getElementById('wordList').innerHTML = '';
-  document.getElementById('emptyMsg').style.display = 'block';
-  document.getElementById('clearBtn').style.display = 'none';
-}
+      function clearLearnedWords() {
+        localStorage.removeItem("learnedWords");
+        document.getElementById("wordList").innerHTML = "";
+        document.getElementById("emptyMsg").style.display = "block";
+        document.getElementById("clearBtn").style.display = "none";
+      }
 
-function goBack() {
-  // ⬇️ set this to your real dashboard/welcome page
-  window.location.href = 'welcome.html';
-}
-</script>
-<script src="xp.js"></script>
-<script>
-  renderXP('xpDisplay');
-  document.querySelector('.xp-fill').style.width = 
-  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
-</script>
-</body>
+      function goBack() {
+        // ⬇️ set this to your real dashboard/welcome page
+        window.location.href = "welcome.html";
+      }
+    </script>
+    <script src="xp.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const xpContainer = document.getElementById("xpDisplay");
+
+        // 1. Let xp.js write the level + XP text
+        renderXP("xpDisplay");
+
+        // 2. Now inject the beautiful progress bar (it won't be overwritten anymore)
+        if (!document.querySelector(".xp-progress")) {
+          xpContainer.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div class="xp-progress">
+                <div class="xp-fill"></div>
+            </div>
+        `
+          );
+        }
+
+        // 3. Finally fill the green bar
+        if (typeof getXP === "function" && typeof XP_PER_LEVEL === "number") {
+          const progress = ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
+          const fill = document.querySelector(".xp-fill");
+          if (fill) fill.style.width = progress + "%";
+        }
+      });
+    </script>
+  </body>
 </html>
