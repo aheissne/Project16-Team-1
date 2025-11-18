@@ -59,6 +59,9 @@
 </head>
 <body>
   <div class="container">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+        Loading XP...
+        </div>
     <div class="question"><span id="currentWord">_____</span> means?</div>
 
     <div id="hintArea">
@@ -273,6 +276,8 @@
           localStorage.setItem('learnedWords', JSON.stringify([...list]));
         }
 
+        addXP(25);                       // ← NEW LINE
+
         // wait 1.8 seconds so the user can see the feedback, then go to next word
         setTimeout(() => {
           currentIndex += 1;
@@ -424,6 +429,11 @@
       await showCurrentHint(entry, wordText);
     });
   </script>
+  <script src="xp.js"></script>
+  <script>
+  renderXP('xpDisplay');
+  document.querySelector('.xp-fill').style.width = 
+  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+</script>
 </body>
 </html>
-
