@@ -16,11 +16,28 @@
     .restart:hover{background:#2d8445}
     .view-results:hover{background:#306ac3}
     .footer{margin-top:40px;color:#ccc;font-size:.8em;text-align:center}
+    /* === Beautiful XP Bar === */
+        .xp-progress{
+            height:10px;
+            background:#e0e0e0;
+            border-radius:6px;
+            overflow:hidden;
+            margin-top:2px;
+            box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .xp-fill{
+            height:100%;
+            background:linear-gradient(to right,#34a853,#5dd46c);
+            width:0%;
+            border-radius:6px;
+            transition:width 0.8s ease-out;
+            box-shadow:0 2px 4px rgba(52,168,83,0.3);
+        }
   </style>
 </head>
 <body>
   <div class="complete-container">
-    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8;">
+    <div class="xp-bar" id="xpDisplay" style="margin: 20px 0; font-weight: bold; color: #1a73e8; display: inline-block;">
         Loading XP...
         </div>
     <div class="message">🎉 Congratulations! You've completed the quiz!</div>
@@ -30,10 +47,10 @@
     <button class="view-results" onclick="window.location.href='quiz-results.html'">View Results</button>
 
     </div>
-  </div>
   <div class="footer">
     <div>Contact Support: <a href="mailto:support@scaffwording.app">support@scaffwording.app</a></div>
     <div>©2024 Scaffwording. All Rights Reserved</div>
+  </div>
   </div>
 
   <script>
@@ -54,9 +71,28 @@
   </script>
   <script src="xp.js"></script>
   <script>
-  renderXP('xpDisplay');
-  document.querySelector('.xp-fill').style.width = 
-  ((getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100) + '%';
+window.addEventListener('load', () => {
+    const xpContainer = document.getElementById('xpDisplay');
+
+    // 1. Let xp.js write the level + XP text
+    renderXP('xpDisplay');
+
+    // 2. Now inject the beautiful progress bar (it won't be overwritten anymore)
+    if (!document.querySelector('.xp-progress')) {
+        xpContainer.insertAdjacentHTML('beforeend', `
+            <div class="xp-progress">
+                <div class="xp-fill"></div>
+            </div>
+        `);
+    }
+
+    // 3. Finally fill the green bar
+    if (typeof getXP === 'function' && typeof XP_PER_LEVEL === 'number') {
+        const progress = (getXP() % XP_PER_LEVEL) / XP_PER_LEVEL * 100;
+        const fill = document.querySelector('.xp-fill');
+        if (fill) fill.style.width = progress + '%';
+    }
+});
 </script>
 </body>
 </html>
